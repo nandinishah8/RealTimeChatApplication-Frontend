@@ -1,0 +1,93 @@
+/* Styles for the background container */
+.background {
+    background-image: url('../../../assets/login_bg.jpg');
+    background-size: 100% 120%;
+    background-repeat: no-repeat;
+    /* padding: 0px; */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+/* Styles for the form container */
+.card {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    width: 350px;
+}
+
+/* Styles for the form heading */
+h2 {
+    margin-top: 4px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+span {
+    font-size: 15px;
+    margin-bottom: 20px;
+}
+
+/* Styles for the input fields */
+input {
+    font-size: medium;
+    width: 90%;
+    padding: 15px;
+    padding-right: 5px;
+    margin: 10px;
+    border: 1px solid #ccc;
+    border-radius: 25px;
+}
+
+/* Styles for the error messages */
+.error-message {
+    font-size: 15px;
+    color: red;
+}
+
+/* Styles for the error class applied to inputs with errors */
+input.error {
+    border-color: red;
+    margin-inline: 10px;
+}
+
+/* Styles for the submit button */
+button {
+    margin-left: 106px;
+    width: 150px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    font-size: 16px;
+    font-weight: bold;
+    padding: 14px;
+    margin-top: 15px;
+    border-radius: 25px;
+    cursor: pointer;
+}
+
+button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Styles for the link to the registration page */
+.signup-link {
+    margin-top: 10px;
+    text-align: center;
+}
+
+/* Styles for the link text */
+.signup-link a {
+    color: #007bff;
+    text-decoration: none;
+}
+
+/* Styles for the link text when hovered */
+.signin-link a:hover {
+    text-decoration: underline;
+}

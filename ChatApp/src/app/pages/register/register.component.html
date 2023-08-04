@@ -1,0 +1,34 @@
+<div class="background">
+    <div class="card">
+        <h2>Register</h2>
+        <form [formGroup]="registrationForm" (ngSubmit)="registerUser()">
+
+            <input type="text" placeholder="Full Name" name="name" id="name" formControlName="name"
+                [ngClass]="{'error': getControl('name')?.errors && getControl('name')?.touched}">
+            <span style="color: red;"
+                *ngIf="registrationForm.get('name')?.errors?.['required'] && (registrationForm.get('name')?.dirty || registrationForm.get('name')?.touched)">
+                Name is required.
+            </span>
+
+            <input type="email" placeholder="Your Email" name="email" id="email" formControlName="email"
+                [pattern]="emailRegex"
+                [ngClass]="{'error': getControl('email')?.errors && getControl('email')?.touched}">
+            <span style="color: red;"
+                *ngIf="registrationForm.get('email')?.errors?.['required'] && (registrationForm.get('email')?.dirty || registrationForm.get('email')?.touched)">
+                Email is required.
+            </span>
+
+            <input type="password" placeholder="Password" name="password" id="password" formControlName="password"
+                [ngClass]="{'error': getControl('password')?.errors && getControl('password')?.touched}">
+            <span style="color: red;"
+                *ngIf="registrationForm.get('password')?.errors?.['required'] && (registrationForm.get('password')?.dirty || registrationForm.get('password')?.touched)">
+                Password is required.
+            </span>
+
+            <button type="submit" [disabled]="registrationForm.invalid">Register</button>
+            <div class="signin-link">
+                Already have an account? <a routerLink="/"><b>Sign In</b></a>
+            </div>
+        </form>
+    </div>
+</div>

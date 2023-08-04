@@ -1,0 +1,149 @@
+body {
+    background-color:whitesmoke;
+    margin-top: 20px;
+}
+
+.card {
+    background: whitesmoke;
+    transition: .5s;
+    border: 0;
+    margin-bottom: 30px;
+    border-radius: .55rem;
+    position: relative;
+    width: 100%;
+    box-shadow: 0 1px 2px 0 rgb(0 0 0 / 10%);
+}
+
+/* .container {
+    margin: 0 auto;
+    width: 100%;
+    background: #444753;
+    border-radius: 5px;
+    
+} */
+
+
+.header {
+    background: #0048AA;
+        border-radius: 2px 0 0 2px;
+        flex-basis: 275px;
+        margin-left: 0px;
+        height: 651px;
+        width: 260px
+}
+
+.people-list {
+    width: 260px;
+    float: left;
+}
+
+.search {
+    padding: 20px;
+    margin-top: -22px;
+}
+
+.fa-search {
+    position: relative;
+    left: -25px;
+}
+
+
+.people-list ul {
+    list-style: none;
+    padding: 10px;
+    height: 510px;
+    margin-top: -22px;
+}
+
+.people-list li {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    margin-left: -14px;
+}
+
+.people-list li:hover {
+    background-color: lightgray;
+    width: 245px;
+}
+
+.profile {
+    display: flex;
+    align-items: center;
+    margin-left: 0px;
+}
+
+.user-image {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background-color: skyblue;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    margin-right: 5px;
+    margin-left: 5px;
+
+}
+
+.user-image span {
+    font-size: 18px;
+    font-weight: bold;
+    color: #333333;
+}
+
+.about {
+    flex: 1;
+}
+
+.name {
+    font-weight: bold;
+    color: black;
+}
+
+.email {
+    color: black;
+}
+
+.input-group {
+    margin-bottom: 10px;
+}
+
+.input-group-prepend {
+    display: flex;
+    align-items: center;
+    padding: 5px;
+    background-color: #f0f0f0;
+}
+
+.form-control {
+    border: none;
+    border-radius: none;
+    box-shadow: none;
+}
+
+.column-border {
+    width: 260px;
+    border-top: 2px solid #ccc;
+    margin: 14px 0;
+}
+
+
+
+.app-logo img {
+    width: 90px;
+    height: 90px;
+    display: flex;
+    padding-top: 5px;
+
+
+}
+
+.app-name {
+    font-size: 30px;
+    font-weight: bold;
+    display: contents;
+    padding-left: 90px;
+}

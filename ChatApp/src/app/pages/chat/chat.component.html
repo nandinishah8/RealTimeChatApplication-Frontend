@@ -1,0 +1,33 @@
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" />
+
+<div class="container">
+    <div class="row clearfix">
+        <div class="col-lg-12">
+            <div id="side-bar">
+                <div id="plist" class="people-list">
+                    <div class="header">
+                        <a class="app-logo">
+                            <!-- <img src="../../../assets/lg.jpg" /> -->
+                            <span class="app-name">Minimal Chat</span>
+                        </a>
+                        <div class="column-border"></div>
+                        <ul class="list-unstyled chat-list mt-2 mb-0">
+
+                            <li *ngFor="let user of users" class="clearfix" (click)="showMessage(user.id)">
+                                <div class="profile">
+                                    <div class="user-image">
+                                        <span>{{ user.name.charAt(0) }}</span>
+                                    </div>
+                                </div>
+                                <div class="about">
+                                    <div class="name">{{ user.name }}</div>
+                                    <div class="email">{{ user.email }}</div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <router-outlet name="childPopup"></router-outlet>
+            </div>
+        </div>
+    </div>

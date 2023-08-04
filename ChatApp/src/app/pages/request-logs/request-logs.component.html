@@ -1,0 +1,73 @@
+<div class="container">
+    <h1>Request Logs</h1>
+
+    <!-- Dropdown to select timeframe -->
+    <div class="form-group">
+        <label for="timeframe">Select Timeframe:</label>
+        <select class="form-control" id="timeframe" [(ngModel)]="selectedTimeframe" (ngModelChange)="getLogs()">
+            <option value="last5mins">Last 5 mins</option>
+            <option value="last10mins">Last 10 mins</option>
+            <option value="last30mins">Last 30 mins</option>
+            <option value="custom">Custom</option>
+        </select>
+
+        <div *ngIf="selectedTimeframe === 'custom'">
+            <label for="customStartTime">Start Time:</label>
+            <input type="datetime-local" [(ngModel)]="customStartTime">
+            <label for="customEndTime">End Time:</label>
+            <input type="datetime-local" [(ngModel)]="customEndTime">
+            <button class="btn btn-secondary" (click)="getLogs()">Load Logs</button>
+        </div>
+    </div>
+
+    <!-- Checkbox inputs to show/hide columns -->
+    <div class="form-group">
+        <label>Show Columns:</label>
+
+        <label class="checkbox-label">
+            <input type="checkbox" [(ngModel)]="showColumns.id" (change)="toggleColumn('id')" /> ID
+        </label>
+        <label class="checkbox-label">
+            <input type="checkbox" [(ngModel)]="showColumns.timestamp" (change)="toggleColumn('timestamp')" /> Timestamp
+        </label>
+        <label class="checkbox-label">
+            <input type="checkbox" [(ngModel)]="showColumns.ipAddress" (change)="toggleColumn('ipAddress')" /> IP
+            Address
+        </label>
+        <label class="checkbox-label">
+            <input type="checkbox" [(ngModel)]="showColumns.username" (change)="toggleColumn('username')" /> Username
+        </label>
+        <label class="checkbox-label">
+            <input type="checkbox" [(ngModel)]="showColumns.requestBody" (change)="toggleColumn('requestBody')" />
+            Request Body
+        </label>
+    </div>
+
+    <button class="btn btn-primary" (click)="getLogs()">Fetch Logs</button>
+
+
+
+    <!-- Table to display logs -->
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th *ngIf="showColumns.requestBody">Request Body</th>
+                    <th *ngIf="showColumns.id">ID</th>
+                    <th *ngIf="showColumns.timestamp">Timestamp</th>
+                    <th *ngIf="showColumns.ipAddress">IP Address</th>
+                    <th *ngIf="showColumns.username">Username</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let log of logs">
+                    <td *ngIf="showColumns.requestBody">{{ log.requestBody }}</td>
+                    <td *ngIf="showColumns.id">{{ log.id }}</td>
+                    <td *ngIf="showColumns.timestamp">{{ log.timestamp }}</td>
+                    <td *ngIf="showColumns.ipAddress">{{ log.ip }}</td>
+                    <td *ngIf="showColumns.username">{{ log.username }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

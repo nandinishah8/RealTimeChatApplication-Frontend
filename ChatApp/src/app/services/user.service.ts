@@ -8,7 +8,7 @@ import jwt_decode from 'jwt-decode';
 })
 export class UserService {
   constructor(private http: HttpClient) {}
-  url = 'http://localhost:5243/api';
+  url = 'http://localhost:5243/api/Users';
   private tokenKey = 'auth_token';
 
   signup(user: any): Observable<any> {

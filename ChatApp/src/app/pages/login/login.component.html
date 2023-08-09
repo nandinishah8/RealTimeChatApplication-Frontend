@@ -20,7 +20,15 @@
                     Password is required.
                 </span>
             </div>
+
             <button type="submit" [disabled]="loginForm.invalid">Login</button>
+            <div>
+                <asl-google-signin-button type="standard" size='medium' shape="pill" theme="outline" text="signin_with"
+                    logo_alignment="left"
+                    style="display: flex; justify-content: center; margin: 15px 0;"></asl-google-signin-button>
+            </div>
+
+
             <div class="signup-link">
                 Don't have an account? <a routerLink="/register"><b>Register</b></a>
             </div>

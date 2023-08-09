@@ -9,6 +9,12 @@ import { HttpClientModule } from '@angular/common/http';
 import { ChatComponent } from './pages/chat/chat.component';
 import { ConversationComponent } from './pages/conversation/conversation.component';
 import { RequestLogsComponent } from './pages/request-logs/request-logs.component';
+import {
+  SocialLoginModule,
+  SocialAuthServiceConfig,
+  GoogleSigninButtonModule,
+} from '@abacritt/angularx-social-login';
+import { GoogleLoginProvider } from '@abacritt/angularx-social-login';
 
 @NgModule({
   declarations: [
@@ -25,8 +31,28 @@ import { RequestLogsComponent } from './pages/request-logs/request-logs.componen
     ReactiveFormsModule,
     FormsModule,
     HttpClientModule,
+    SocialLoginModule,
+    GoogleSigninButtonModule,
   ],
-  providers: [],
+  providers: [
+    {
+      provide: 'SocialAuthServiceConfig',
+      useValue: {
+        autoLogin: false,
+        providers: [
+          {
+            id: GoogleLoginProvider.PROVIDER_ID,
+            provider: new GoogleLoginProvider(
+              '769595321126-34b52bv6kri8b04jv8f6n2g3dk4rmb5e.apps.googleusercontent.com'
+            ),
+          },
+        ],
+        onError: (err) => {
+          console.error(err);
+        },
+      } as SocialAuthServiceConfig,
+    },
+  ],
   bootstrap: [AppComponent],
 })
 export class AppModule {}

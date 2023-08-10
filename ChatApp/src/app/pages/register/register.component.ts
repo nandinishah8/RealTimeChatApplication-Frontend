@@ -5,6 +5,7 @@ import { UserService } from 'src/app/services/user.service';
 import { SocialAuthService } from '@abacritt/angularx-social-login';
 import { GoogleLoginProvider } from '@abacritt/angularx-social-login';
 import { SocialUser } from '@abacritt/angularx-social-login';
+import { SocialLoginService } from 'src/app/services/social-login.service';
 import {
   FormGroup,
   FormBuilder,
@@ -28,6 +29,7 @@ export class RegisterComponent implements OnInit {
     private router: Router,
     private formBuilder: FormBuilder,
     private authService: SocialAuthService,
+    private socialLoginService: SocialLoginService,
     private httpClient: HttpClient
   ) {
     this.registrationForm = this.formBuilder.group({
@@ -73,20 +75,23 @@ export class RegisterComponent implements OnInit {
       .then((accessToken) => (this.accessToken = accessToken));
   }
 
-  getGoogleCalendarData(): void {
-    if (!this.accessToken) return;
+  signInWithGoogle(token: string): void {
+    this.socialLoginService.sendSocialToken(token).subscribe(
+      (response) => {
+        console.log('Social token sent successfully to the backend:', response);
 
-    this.httpClient
-      .get('https://www.googleapis.com/calendar/v3/calendars/primary/events', {
-        headers: { Authorization: `Bearer ${this.accessToken}` },
-      })
-      .subscribe((events) => {
-        alert('Look at your console');
-        console.log('events', events);
-      });
-  }
+        if (response && response.token) {
+          // Store the token and user profile in local storage
+          localStorage.setItem('token', response.token);
+          localStorage.setItem('userProfile', JSON.stringify(response.profile));
 
-  refreshAccessToken(): void {
-    this.authService.refreshAccessToken(GoogleLoginProvider.PROVIDER_ID);
+          // Redirect to the chat route
+          this.router.navigate(['/chat']);
+        }
+      },
+      (error) => {
+        console.error('Error sending social token to the backend:', error);
+      }
+    );
   }
 }

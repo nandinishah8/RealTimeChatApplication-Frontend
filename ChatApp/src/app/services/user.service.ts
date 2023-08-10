@@ -42,7 +42,7 @@ export class UserService {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${this.getToken()}`,
     });
-    return this.http.get<any[]>(this.url + '/users', { headers: headers });
+    return this.http.get<any[]>(this.url, { headers: headers });
   }
 
   getLoggedInUser(): number {

@@ -22,11 +22,33 @@ export class ChatComponent implements OnInit {
   constructor(private userService: UserService, private router: Router) {}
 
   ngOnInit(): void {
-    this.userService.retrieveUsers().subscribe((res) => {
-      console.log(res);
-      this.users = res;
-      this.currentReceiver = res[0];
-    });
+    console.log('Initializing component...');
+
+    this.userService.retrieveUsers().subscribe(
+      (res) => {
+        console.log('Received users:', res);
+        console.log('Is res an array?', Array.isArray(res));
+
+        this.users = res; // Make sure this is a properly populated array
+        console.log('this.users:', this.users);
+
+        if (Array.isArray(this.users)) {
+          console.log('this.users is an array:', this.users);
+
+          this.currentReceiver = this.users[0];
+
+          this.users.forEach((user) => {
+            console.log('User name:', user.name);
+            console.log('User email:', user.email);
+          });
+        } else {
+          console.error('this.users is not an array.');
+        }
+      },
+      (error) => {
+        console.error('Error fetching users:', error);
+      }
+    );
   }
 
   onUserClick(user: any) {

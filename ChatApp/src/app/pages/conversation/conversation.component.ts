@@ -11,6 +11,7 @@ import { UserService } from 'src/app/services/user.service';
 })
 export class ConversationComponent implements OnInit {
   currentUserId: number;
+  senderId!: string;
   currentReceiverId!: number;
   currentReceiver: any = {};
   messages: any[] = [];
@@ -48,7 +49,7 @@ export class ConversationComponent implements OnInit {
   }
 
   getMessages(userId: number) {
-    this.messages = [];
+    //this.messages = [];
     console.log(userId);
 
     this.chatService.getMessages(userId).subscribe((res) => {

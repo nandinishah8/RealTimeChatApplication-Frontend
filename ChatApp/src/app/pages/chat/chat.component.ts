@@ -57,7 +57,7 @@ export class ChatComponent implements OnInit {
     this.currentReceiver = user;
   }
 
-  showMessage(id: any) {
+  showMessage(id: string) {
     this.router.navigate(['/chat', { outlets: { childPopup: ['user', id] } }]);
   }
 }

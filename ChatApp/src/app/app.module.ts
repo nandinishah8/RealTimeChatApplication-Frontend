@@ -9,6 +9,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { ChatComponent } from './pages/chat/chat.component';
 import { ConversationComponent } from './pages/conversation/conversation.component';
 import { RequestLogsComponent } from './pages/request-logs/request-logs.component';
+import { SignalrService } from './services/signalr.service';
 import {
   SocialLoginModule,
   SocialAuthServiceConfig,
@@ -52,6 +53,7 @@ import { GoogleLoginProvider } from '@abacritt/angularx-social-login';
         },
       } as SocialAuthServiceConfig,
     },
+    SignalrService,
   ],
   bootstrap: [AppComponent],
 })

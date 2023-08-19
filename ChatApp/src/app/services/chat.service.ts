@@ -10,7 +10,7 @@ export class ChatService {
   constructor(private http: HttpClient, private user: UserService) {}
   url = 'http://localhost:5243/api/Messages';
 
-  sendMessage(receiverId: number, content: string): Observable<any> {
+  sendMessage(receiverId: string, content: string): Observable<any> {
     const headers = new HttpHeaders({
       'Content-Type': 'application/json',
       Authorization: `Bearer ${this.user.getToken()}`,
@@ -27,7 +27,30 @@ export class ChatService {
     );
   }
 
-  getMessages(id: number): Observable<any[]> {
+  // getMessages(id: number): Observable<any[]> {
+  //   let token = localStorage.getItem('auth_token');
+  //   console.log(token);
+
+  //   const headers = new HttpHeaders({
+  //     'Content-Type': 'application/json',
+  //     Authorization: `Bearer ${token}`,
+  //   });
+
+  //   console.log(id);
+
+  //   return this.http
+  //     .get<any[]>(`http://localhost:5243/api/Messages/${id}`, {
+  //       headers: headers,
+  //     })
+  //     .pipe(
+  //       map((response: any) => {
+  //         console.log('getMessages response:', response);
+  //         return response.messages;
+  //       })
+  //     );
+  // }
+
+  getMessages(userId: string): Observable<any[]> {
     let token = localStorage.getItem('auth_token');
     console.log(token);
 
@@ -36,10 +59,9 @@ export class ChatService {
       Authorization: `Bearer ${token}`,
     });
 
-    console.log(id);
-
+    console.log(userId);
     return this.http
-      .get<any[]>(`http://localhost:5243/api/Messages/${id}`, {
+      .get<any[]>(`http://localhost:5243/api/Messages?UserId=${userId}`, {
         headers: headers,
       })
       .pipe(

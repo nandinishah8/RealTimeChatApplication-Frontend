@@ -89,7 +89,6 @@ export class ConversationComponent implements OnInit {
         },
         (error) => {
           console.error('Error sending message:', error);
-          // Handle the error if needed
         }
       );
   }

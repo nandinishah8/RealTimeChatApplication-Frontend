@@ -10,9 +10,9 @@ import { UserService } from 'src/app/services/user.service';
   styleUrls: ['./conversation.component.css'],
 })
 export class ConversationComponent implements OnInit {
-  currentUserId: number;
+  currentUserId: string;
   senderId!: string;
-  currentReceiverId!: number;
+  currentReceiverId!: string;
   currentReceiver: any = {};
   messages: any[] = [];
   messageContent: string = '';
@@ -23,12 +23,12 @@ export class ConversationComponent implements OnInit {
     private chatService: ChatService,
     private http: HttpClient
   ) {
-    this.currentUserId = this.userService.getLoggedInUser();
+    this.currentUserId = this.userService.getLoggedInUser().toString();
   }
 
   ngOnInit(): void {
     this.route.params.subscribe((params) => {
-      const userId = +params['userId'];
+      const userId = params['userId'].toString();
       this.currentReceiverId = userId;
 
       console.log('currentReceiverId:', this.currentReceiverId);
@@ -48,13 +48,17 @@ export class ConversationComponent implements OnInit {
     }
   }
 
-  getMessages(userId: number) {
+  getMessages(userId: string) {
     //this.messages = [];
     console.log(userId);
 
     this.chatService.getMessages(userId).subscribe((res) => {
       console.log('getMessages response:', res);
       this.messages = res;
+
+      // Extract userId and conversationId from the fetched messages
+      this.currentUserId = this.messages[0].senderId;
+      this.currentReceiverId = this.messages[0].receiverId;
     });
     console.log('getMessages messages:', this.messages);
   }
@@ -75,17 +79,18 @@ export class ConversationComponent implements OnInit {
     this.messages.push(message);
     localStorage.setItem('chatMessages', JSON.stringify(this.messages));
 
-    this.chatService.sendMessage(message.receiverId, message.content).subscribe(
-      (response) => {
-        // Handle the response from the backend if needed
-        this.messages.push(response);
-        this.messageContent = '';
-      },
-      (error) => {
-        console.error('Error sending message:', error);
-        // Handle the error if needed
-      }
-    );
+    this.chatService
+      .sendMessage(this.currentReceiverId, message.content)
+      .subscribe(
+        (response) => {
+          // Handle the response from the backend if needed
+          this.messages.push(response);
+          this.messageContent = '';
+        },
+        (error) => {
+          console.error('Error sending message:', error);
+        }
+      );
   }
 
   onContextMenu(event: MouseEvent, message: any) {

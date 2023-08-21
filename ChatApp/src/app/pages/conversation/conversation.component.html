@@ -29,8 +29,8 @@
             </nav>
             <div class="chat-container">
                 <div class="chat-messages" style="height: 492px;">
-                    <div [ngClass]="{'chat-message outgoing': message?.senderId === currentUserId, 'chat-message incoming': message?.senderId !== currentUserId
-                        }" *ngFor="let message of messages" (contextmenu)="onContextMenu($event, message)">
+                    <div [ngClass]="{'chat-message outgoing': message?.senderId === currentUserId, 'chat-message incoming': message?.senderId !== currentUserId}"
+                        *ngFor="let message of messages" (contextmenu)="onContextMenu($event, message)">
                         <span class="message-content" *ngIf="!message.editMode && !message.deleteMode">
                             <p>{{message.content}} </p>
                             <p>{{message.timestamp}}</p>

@@ -74,6 +74,7 @@ export class ConversationComponent implements OnInit {
       senderId: this.currentUserId,
       content: this.messageContent.trim(),
       isEvent: false,
+      messageDirection: 'outgoing',
     };
 
     this.messages.push(message);

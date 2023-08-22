@@ -35,6 +35,7 @@
                             <p>{{message.content}} </p>
                             <p>{{message.timestamp}}</p>
                         </span>
+
                         <div *ngIf="message.isEvent && !message.editMode && !message.deleteMode" class="editor-actions">
                             <button class="edit-button" (click)="onEditMessage(message)">
                                 <i class="fa fa-pencil-square-o" aria-hidden="true"></i>

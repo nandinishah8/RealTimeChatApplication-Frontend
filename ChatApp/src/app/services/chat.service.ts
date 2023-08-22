@@ -27,29 +27,6 @@ export class ChatService {
     );
   }
 
-  // getMessages(id: number): Observable<any[]> {
-  //   let token = localStorage.getItem('auth_token');
-  //   console.log(token);
-
-  //   const headers = new HttpHeaders({
-  //     'Content-Type': 'application/json',
-  //     Authorization: `Bearer ${token}`,
-  //   });
-
-  //   console.log(id);
-
-  //   return this.http
-  //     .get<any[]>(`http://localhost:5243/api/Messages/${id}`, {
-  //       headers: headers,
-  //     })
-  //     .pipe(
-  //       map((response: any) => {
-  //         console.log('getMessages response:', response);
-  //         return response.messages;
-  //       })
-  //     );
-  // }
-
   getMessages(userId: string): Observable<any[]> {
     let token = localStorage.getItem('auth_token');
     console.log(token);

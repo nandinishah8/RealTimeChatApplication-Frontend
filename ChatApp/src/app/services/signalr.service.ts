@@ -7,35 +7,55 @@ import { HubConnection, HubConnectionBuilder } from '@microsoft/signalr';
   providedIn: 'root',
 })
 export class SignalrService {
-  token = localStorage.getItem('authToken');
-  private connection: any = new signalR.HubConnectionBuilder()
-    .withUrl(`https://localhost:7223/chat?token=${this.token}`)
-    .configureLogging(signalR.LogLevel.Information)
-    .build();
-  private hubConnection: HubConnection;
+  private hubConnection!: signalR.HubConnection;
+  private reconnectInterval = 5000;
+
   constructor() {
-    this.hubConnection = new HubConnectionBuilder()
-      .withUrl('http://localhost:5243/chatHub') // Update with your SignalR hub URL
-      .withAutomaticReconnect()
+    this.hubConnection = new signalR.HubConnectionBuilder()
+      .withUrl('http://localhost:5243/chatHub') // Replace with your SignalR hub URL
+      .configureLogging(signalR.LogLevel.Information)
       .build();
+
+    this.hubConnection.onclose((error) => {
+      console.error('SignalR Connection closed with an error:', error);
+      this.startReconnection(); // Attempt to reconnect
+    });
   }
 
-  startConnection() {
-    this.hubConnection
+  public startConnection(): Promise<void> {
+    return this.hubConnection
       .start()
       .then(() => {
-        console.log('SignalR connection started');
+        console.log('SignalR Connection started');
+        const connectionId = this.hubConnection.connectionId;
+        console.log('Connection ID:', connectionId);
       })
-      .catch((err) => {
-        console.error('Error while starting SignalR connection:', err);
+      .catch((error) => {
+        console.error('Error starting SignalR connection:', error);
+        // Retry the connection after a delay
+        setTimeout(() => {
+          this.startConnection();
+        }, 5000);
       });
   }
 
-  // Send a message to the SignalR hub
-  sendMessage(message: any) {
-    this.hubConnection
-      .invoke('SendMessage', message)
-      .catch((error) => console.error('SignalR Error:', error));
+  private startReconnection() {
+    setTimeout(() => {
+      console.log('Attempting to reconnect...');
+      this.startConnection();
+    }, this.reconnectInterval);
+  }
+
+  sendMessage(message: {
+    receiverId: string;
+    senderId: string;
+    content: string;
+  }) {
+    if (this.hubConnection.state === signalR.HubConnectionState.Connected) {
+      this.hubConnection.invoke('SendMessage', message);
+    } else {
+      console.error('SignalR connection not in the Connected state');
+    }
   }
 
   onReceiveMessage(callback: (message: any) => void) {

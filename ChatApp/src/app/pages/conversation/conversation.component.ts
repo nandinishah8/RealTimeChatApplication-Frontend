@@ -3,6 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { ChatService } from 'src/app/services/chat.service';
 import { UserService } from 'src/app/services/user.service';
+import { SignalrService } from 'src/app/services/signalr.service';
 
 @Component({
   selector: 'app-conversation',
@@ -16,11 +17,15 @@ export class ConversationComponent implements OnInit {
   currentReceiver: any = {};
   messages: any[] = [];
   messageContent: string = '';
+  outgoingMessages: any[] = [];
+  incomingMessages: any[] = [];
+  //signalrService: any;
 
   constructor(
     private route: ActivatedRoute,
     private userService: UserService,
     private chatService: ChatService,
+    private signalrService: SignalrService,
     private http: HttpClient
   ) {
     this.currentUserId = this.userService.getLoggedInUser().toString();
@@ -46,6 +51,14 @@ export class ConversationComponent implements OnInit {
     if (savedMessages) {
       this.messages = JSON.parse(savedMessages);
     }
+
+    this.signalrService.onReceiveMessage((message: { senderId: string }) => {
+      if (message.senderId === this.currentUserId) {
+        this.outgoingMessages.push(message);
+      } else {
+        this.incomingMessages.push(message);
+      }
+    });
   }
 
   getMessages(userId: string) {
@@ -74,9 +87,10 @@ export class ConversationComponent implements OnInit {
       senderId: this.currentUserId,
       content: this.messageContent.trim(),
       isEvent: false,
-      messageDirection: 'outgoing',
     };
 
+    this.signalrService.sendMessage(message);
+    this.messageContent = '';
     this.messages.push(message);
     localStorage.setItem('chatMessages', JSON.stringify(this.messages));
 

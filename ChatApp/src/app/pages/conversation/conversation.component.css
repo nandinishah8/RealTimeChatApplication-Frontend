@@ -172,3 +172,29 @@ input[type="text"] {
     margin-left: 8px;
     cursor: pointer;
 }
+
+/* .message-container {
+    display: flex;
+    justify-content: flex-start;
+   
+    margin-bottom: 10px;
+}
+
+.received-message {
+    background-color: #f0f0f0;
+    padding: 8px;
+    border-radius: 8px;
+    max-width: 70%;
+    word-wrap: break-word;
+}
+
+.sent-message {
+    background-color: #007bff;
+    color: white;
+    padding: 8px;
+    border-radius: 8px;
+    max-width: 70%;
+    word-wrap: break-word;
+    align-self: flex-end;
+    
+} */

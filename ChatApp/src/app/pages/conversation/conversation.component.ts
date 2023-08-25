@@ -51,6 +51,7 @@ export class ConversationComponent implements OnInit {
       console.log('Received message:', receivedMessage);
 
       const isReceived = receivedMessage.receiverId === this.currentUserId;
+      console.log('is received value',isReceived);
 
       //   const newReceivedMessage = {
       //     senderId: senderId,
@@ -66,7 +67,7 @@ export class ConversationComponent implements OnInit {
         receiverId: receivedMessage.receiverId,
         content: receivedMessage.content,
         timestamp: receivedMessage.timestamp,
-        isReceived: isReceived,
+        // isReceived: receivedMessage.true,
       };
       this.messages.push(newReceivedMessage);
     });
@@ -95,7 +96,7 @@ export class ConversationComponent implements OnInit {
 
       // Extract userId and conversationId from the fetched messages
       this.currentUserId = this.messages[0].senderId;
-      this.currentReceiverId = this.messages[0].receiverId;
+      //this.currentReceiverId = this.messages[0].receiverId;
       console.log('getMessages messages:', this.messages);
     });
   }
@@ -157,7 +158,7 @@ export class ConversationComponent implements OnInit {
 
   onContextMenu(event: MouseEvent, message: any) {
     event.preventDefault();
-    if (message.senderId === this.currentUserId) {
+    if (message.senderId !== this.currentReceiverId) {
       message.isEvent = !message.isEvent;
     }
     this.sendMessage();

@@ -16,15 +16,17 @@ export class ChatService {
       Authorization: `Bearer ${this.user.getToken()}`,
     });
     const body = {
-      receiverId: receiverId,
-      content: content,
+      "receiverId": receiverId,
+      "content": content,
     };
-    return this.http.post(this.url, body, { headers: headers }).pipe(
-      map((response: any) => {
-        console.log('sendMessage response:', response);
-        return response.messages;
-      })
-    );
+    // return this.http.post(this.url, body, { headers: headers }).pipe(
+    //   map((response: any) => {
+    //     console.log('sendMessage response:', response);
+    //     return response.messages;
+    //   })
+    // );
+
+    return this.http.post<any>(this.url, body, { headers: headers });
   }
 
   // getMessages(id: number): Observable<any[]> {

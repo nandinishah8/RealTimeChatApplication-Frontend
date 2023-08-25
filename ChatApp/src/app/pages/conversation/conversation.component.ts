@@ -4,6 +4,9 @@ import { ActivatedRoute } from '@angular/router';
 import { ChatService } from 'src/app/services/chat.service';
 import { UserService } from 'src/app/services/user.service';
 import { SignalrService } from 'src/app/services/signalr.service';
+import { ChangeDetectorRef } from '@angular/core';
+import { NgZone } from '@angular/core';
+import { MessageDto } from 'Dto/MessageDto';
 //import { Message } from 'Message.model';
 
 @Component({
@@ -26,6 +29,8 @@ export class ConversationComponent implements OnInit {
     private userService: UserService,
     private chatService: ChatService,
     private signalrService: SignalrService,
+    private changeDetector: ChangeDetectorRef,
+    private ngZone: NgZone,
     private http: HttpClient
   ) {
     this.currentUserId = this.userService.getLoggedInUser().toString();
@@ -47,38 +52,23 @@ export class ConversationComponent implements OnInit {
       });
     });
 
-    this.signalrService.onReceiveMessage((receivedMessage: any) => {
-      console.log('Received message:', receivedMessage);
+  this.signalrService.retrieveMappedObject().subscribe((receivedMessage: MessageDto) => {
+  console.log('Received message:', receivedMessage);
 
-      const isReceived = receivedMessage.receiverId === this.currentUserId;
-      console.log('is received value',isReceived);
+  // Check if the received message already exists in the messages array
+  const existingMessage = this.messages.find(message => message.id === receivedMessage.id);
 
-      //   const newReceivedMessage = {
-      //     senderId: senderId,
-      //     receiverId: receivedMessage.receiverId,
-      //     content: receivedMessage.content,
-      //     timestamp: receivedMessage.timestamp,
-      //     isReceived: isReceived,
-      //   };
-      //   this.messages.push(newReceivedMessage);
-      // }
-      const newReceivedMessage = {
-        senderId: receivedMessage.senderId,
-        receiverId: receivedMessage.receiverId,
-        content: receivedMessage.content,
-        timestamp: receivedMessage.timestamp,
-        // isReceived: receivedMessage.true,
-      };
-      this.messages.push(newReceivedMessage);
-    });
+  if (!existingMessage) {
+    this.messages.push(receivedMessage);
 
-    // this.signalrService.onReceiveMessage((message: any) => {
-    //   if (message.senderId === this.currentUserId) {
-    //     this.outgoingMessages.push(message);
-    //   } else {
-    //     this.incomingMessages.push(message);
-    //   }
-    // });
+    // Sort the messages array by timestamp in descending order
+    this.messages.sort((a, b) => b.timestamp - a.timestamp);
+
+    // You may also want to trigger change detection here
+    this.changeDetector.detectChanges();
+  }
+});
+
 
     const savedMessages = localStorage.getItem('chatMessages');
     if (savedMessages) {
@@ -94,9 +84,7 @@ export class ConversationComponent implements OnInit {
       console.log('getMessages response:', res);
       this.messages = res;
 
-      // Extract userId and conversationId from the fetched messages
-      this.currentUserId = this.messages[0].senderId;
-      //this.currentReceiverId = this.messages[0].receiverId;
+      
       console.log('getMessages messages:', this.messages);
     });
   }
@@ -107,28 +95,6 @@ export class ConversationComponent implements OnInit {
       return;
     }
 
-    // const message = {
-    //   receiverId: this.currentReceiverId,
-    //   senderId: this.currentUserId,
-    //   content: this.messageContent.trim(),
-    //   isEvent: false,
-    // };
-
-    // console.log('Sending message from component:', message);
-
-    // this.messages.push({
-    //   senderId: this.currentUserId,
-    //   receiverId: this.currentReceiverId,
-    //   content: message.content,
-    //   timestamp: new Date(),
-    //   isReceived: false,
-    // });
-    // localStorage.setItem('chatMessages', JSON.stringify(this.messages));
-
-    // this.signalrService.sendMessage(message);
-    // // this.signalrService.onReceiveMessage((receivedmessage: any) => {
-    // //   console.log('Received message:', receivedmessage);
-    // // });
 
     this.chatService
       .sendMessage(this.currentReceiverId, this.messageContent.trim())
@@ -139,6 +105,7 @@ export class ConversationComponent implements OnInit {
           // Handle the response from the backend if needed
 
           const message = {
+            id: response.id,
             receiverId: response.receiverId,
             content: response.content,
           };
@@ -148,7 +115,7 @@ export class ConversationComponent implements OnInit {
 
 
           this.messages.push(response);
-          this.messageContent = '';
+          // this.messageContent = '';
         },
         (error) => {
           console.error('Error sending message:', error);

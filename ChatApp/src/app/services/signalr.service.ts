@@ -1,7 +1,10 @@
 import { Injectable } from '@angular/core';
 import * as signalR from '@microsoft/signalr';
 import { HubConnection, HubConnectionBuilder } from '@microsoft/signalr';
+import { MessageDto } from 'Dto/MessageDto';
+import { Subject, Observable } from 'rxjs';
 // import { environment } from 'src/environments/environment';
+// import { Message } from 'Message.model';
 
 @Injectable({
   providedIn: 'root',
@@ -15,28 +18,28 @@ export class SignalrService {
 
   private hubConnection: signalR.HubConnection;
   private isConnectionEstablished: boolean = false;
-  private connectionPromise: Promise<void>;
+  private connectionPromise: Promise<void> | undefined;
+  private sharedObj = new Subject<MessageDto>();
 
   constructor() {
     this.hubConnection = new HubConnectionBuilder()
-      .withUrl('http://localhost:5243/chatHub') // Update with your SignalR hub URL
+      .withUrl('http://localhost:5243/chatHub') 
       .withAutomaticReconnect()
       .build();
 
-    this.connectionPromise = this.startConnection();
     
-  }
+    this.hubConnection.on("ReceiveOne", (message: any, senderId: any) => {
+      const receivedMessageObject: MessageDto = {
+        id: message.id,
+        senderId: senderId,
+        receiverId: message.receiverId,
+        content: message.content
+      };
+      this.sharedObj.next(receivedMessageObject);
+    });
 
-  // startConnection(): Promise<void> {
-  //   return this.hubConnection
-  //     .start()
-  //     .then(() => {
-  //       console.log('SignalR Connection started');
-  //     })
-  //     .catch((error) => {
-  //       console.error('Error starting SignalR connection:', error);
-  //     });
-  // }
+    this.startConnection();
+  }
 
   async startConnection(): Promise<void> {
     try {
@@ -51,30 +54,17 @@ export class SignalrService {
     }
   }
 
-  // Send a message to the SignalR hub
-  // sendMessage(message: any) {
-  //   console.log('Sending message:', message);
-  //   if (this.hubConnection.state === signalR.HubConnectionState.Connected) {
-  //     this.hubConnection
-  //       .invoke('PostMessage', message)
-  //       .then(() => {
-  //         console.log('Message sent successfully:', message);
-  //       })
-  //       .catch((error) => {
-  //         console.error('Error sending message:', error);
-  //       });
-  //   } else {
-  //     console.error('SignalR connection not in the Connected state');
-  //   }
-  // }
+  
 
-  async sendMessage(message: any, senderId: any): Promise<void> {
-    await this.connectionPromise;
-    if (this.isConnectionEstablished) {
-     
-      //const senderId = localStorage.getItem('chatMessages.senderId');
-      this.hubConnection.invoke('SendMessage', message, senderId);
-      console.log('Message sent successfully');
+ sendMessage(message: any, senderId: any): void {
+    if (this.hubConnection.state === signalR.HubConnectionState.Connected) {
+      this.hubConnection.invoke('SendMessage', message, senderId)
+        .then(() => {
+          console.log('Message sent successfully');
+        })
+        .catch((error) => {
+          console.error('Error sending message:', error);
+        });
     } else {
       console.warn('SignalR connection is not established yet.');
     }
@@ -86,16 +76,28 @@ export class SignalrService {
   //   });
   // }
 
-  async onReceiveMessage(callback: (message: any) => void): Promise<void> {
+  async onReceiveMessage( message: any, senderId: string)  {
     await this.connectionPromise;
     if (this.isConnectionEstablished) {
       this.hubConnection.on('ReceiveOne', (message: any, senderId: any) => {
         
         console.log('ReceivedOne:', message);
-        callback(message);
+         const receivedMessageObject: MessageDto = {
+          id: message.id,
+          senderId: senderId,
+          receiverId: message.receiverId,
+          content: message.content
+        };
+        // callback(message, senderId);
+        //this.sharedObj.next(receivedMessageObject);
       });
     } else {
       console.warn('SignalR connection is not established yet.');
     }
   }
+
+  public retrieveMappedObject(): Subject<MessageDto> {
+    return this.sharedObj;
+  }
+
 }

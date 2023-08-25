@@ -1,29 +1,28 @@
-* {
+body,
+div,
+p {
     margin: 0;
     padding: 0;
-    box-sizing: border-box;
 }
 
- html,
 body {
-    height: 100%;
+    /* font-family: Arial, sans-serif; */
+    background-color: #f0f0f0;
 }
 
 
 #chat-container {
     display: flex;
-    flex-grow: 1;
-    background: #FFF;
-    border-radius: 10px;
+    height: 100vh;
 }
 
 
 
 #chat-window {
-    border-radius: 0 10px 10px 0;
-    flex-grow: 1;
-    width: 250px;
-    
+    flex: 1;
+    background-color: #fff;
+    border-left: 1px solid #ccc;
+    overflow: hidden;
 }
 
 
@@ -35,11 +34,20 @@ body {
 
 /* Styles for the top navigation bar */
 .navbar {
-    background-color:  whitesmoke;
-    height: 86px;
-    width: 1099px;
+    background-color: whitesmoke;
+    color: white;
+    padding: 10px;
     display: flex;
     align-items: center;
+}
+
+
+.navbar-brand {
+    display: flex;
+    align-items: center;
+    color: white;
+    text-decoration: none;
+    cursor: pointer;
 }
 
 /* Styles for the user profile image */
@@ -73,9 +81,9 @@ strong {
     padding: 10px;
 }
 
-/* Styles for individual chat messages */
-.chat-message {
-display: flex;
+
+/* .chat-message {
+    display: flex;
     flex-direction: column;
     padding: 10px;
     flex-grow: 1;
@@ -83,32 +91,53 @@ display: flex;
 }
 
 .chat-message {
-    /* Common styles for chat messages */
+ 
     padding: 8px;
     border-radius: 8px;
     max-width: 80%;
     margin: 4px 0;
     max-width: fit-content;
     align-self: flex-end;
+} */
+
+/* Chat messages container */
+.chat-messages {
+    padding: 10px;
+    overflow-y: scroll;
+
+
+
+}
+
+/* Chat message styles */
+.chat-message {
+    padding: 10px;
+    margin: 10px;
+    border-radius: 5px;
 }
 
 .outgoing {
     background-color: #047BD5;
     color: #fff;
     align-self: flex-end;
+    flex-direction: column;
     max-width: fit-content;
     margin-left: auto;
+    margin-bottom: 5px;
     padding: 8px;
     border-radius: 8px;
     cursor: pointer;
     display: flex;
+
 }
 
 .incoming {
     background-color: #f1f1f1;
     color: #333;
-     align-self: flex-start;
-     margin-right: auto;
+    padding: 8px;
+    align-self: flex-start;
+    max-width: fit-content;
+    margin-right: auto;
 }
 
 /* Styles for editor actions */
@@ -149,7 +178,7 @@ display: flex;
 
 /* Styles for the chat input */
 .chat-input {
-    margin-top: 16px;
+    margin-top: 0px;
     display: flex;
     align-items: center;
 }

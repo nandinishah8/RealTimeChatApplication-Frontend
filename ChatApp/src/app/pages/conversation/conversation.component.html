@@ -33,7 +33,7 @@
                         *ngFor="let message of messages" (contextmenu)="onContextMenu($event, message)">
                         <span class="message-content" *ngIf="!message.editMode && !message.deleteMode">
                             <p>{{message.content}} </p>
-                            <p>{{message.timestamp}}</p>
+                            <p>{{ message.timestamp | date:'shortTime' }}</p>
                         </span>
                         <div *ngIf="message.isEvent && !message.editMode && !message.deleteMode" class="editor-actions">
                             <button class="edit-button" (click)="onEditMessage(message)">

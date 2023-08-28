@@ -8,6 +8,7 @@ import { ChangeDetectorRef } from '@angular/core';
 import { NgZone } from '@angular/core';
 import { MessageDto } from 'Dto/MessageDto';
 //import { Message } from 'Message.model';
+import { EditMessageDto } from 'Dto/EditMessageDto';
 
 @Component({
   selector: 'app-conversation',
@@ -53,7 +54,12 @@ export class ConversationComponent implements OnInit {
     });
 
   this.signalrService.retrieveMappedObject().subscribe((receivedMessage: MessageDto) => {
-  console.log('Received message:', receivedMessage);
+    console.log('Received message:', receivedMessage);
+    
+     this.signalrService.retrieveEditedObject().subscribe((editMessage: EditMessageDto) => {
+      // Handle the received edited message here
+      console.log('Received edited message:', editMessage);
+    });
 
   // Check if the received message already exists in the messages array
   const existingMessage = this.messages.find(message => message.id === receivedMessage.id);
@@ -114,7 +120,7 @@ export class ConversationComponent implements OnInit {
           this.signalrService.sendMessage(message, response.senderId);
 
 
-          this.messages.push(response);
+         // this.messages.push(response);1234
           // this.messageContent = '';
         },
         (error) => {
@@ -144,7 +150,9 @@ export class ConversationComponent implements OnInit {
         );
         if (editedMessageIndex !== -1) {
           this.messages[editedMessageIndex].content = message.editedContent;
+          this.signalrService.EditMessage(message);
         }
+
       },
       (error) => {
         console.error('Error editing message:', error);
@@ -159,7 +167,16 @@ export class ConversationComponent implements OnInit {
   }
 
   onEditMessage(message: any) {
-    if (message.senderId === this.currentUserId) {
+    console.log(message);
+    console.log(message.senderId == this.currentReceiverId);
+    console.log(message.senderId);
+    console.log(this.currentReceiverId);
+    
+    
+    
+    
+    if (message.senderId !== this.currentReceiverId) {
+      console.log("hiii");
       message.editMode = true;
       message.editedContent = message.content;
       message.showContextMenu = true; // Add a property to control the context menu visibility

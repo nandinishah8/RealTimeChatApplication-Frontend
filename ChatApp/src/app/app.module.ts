@@ -16,6 +16,7 @@ import {
   GoogleSigninButtonModule,
 } from '@abacritt/angularx-social-login';
 import { GoogleLoginProvider } from '@abacritt/angularx-social-login';
+import { Subscription } from 'rxjs';
 
 @NgModule({
   declarations: [
@@ -34,6 +35,7 @@ import { GoogleLoginProvider } from '@abacritt/angularx-social-login';
     HttpClientModule,
     SocialLoginModule,
     GoogleSigninButtonModule,
+   
   ],
   providers: [
     {

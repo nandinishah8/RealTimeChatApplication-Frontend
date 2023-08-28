@@ -1,6 +1,6 @@
 export class MessageDto {
   id: number;
-  senderId?: string;
+  senderId: string;
   receiverId: string;
   content: string;
 

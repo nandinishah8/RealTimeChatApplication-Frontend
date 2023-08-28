@@ -149,16 +149,21 @@ strong {
 /* Styles for edit and delete buttons */
 .edit-button,
 .delete-button {
-    background: none;
+    background-color: #f0f0f0;
     border: none;
+    padding: 5px;
+    border-radius: 3px;
+    margin-right: 5px;
     cursor: pointer;
-    margin-right: 4px;
 }
 
 /* Styles for the editor container */
+/* Message editor container styles */
 .message-editor-container {
     display: flex;
     align-items: center;
+    margin-top: 5px;
+    color: #777;
 }
 
 /* Styles for the message editor input */
@@ -202,22 +207,22 @@ input[type="text"] {
     cursor: pointer;
 }
 
-/* .message-container {
+/* .message-content {
     display: flex;
     justify-content: flex-start;
-   
-    margin-bottom: 10px;
-}
 
-.received-message {
+    margin-bottom: 10px;
+} */
+
+/* .received-message {
     background-color: #f0f0f0;
     padding: 8px;
     border-radius: 8px;
     max-width: 70%;
     word-wrap: break-word;
-}
+} */
 
-.sent-message {
+/* .sent-message {
     background-color: #007bff;
     color: white;
     padding: 8px;
@@ -225,5 +230,5 @@ input[type="text"] {
     max-width: 70%;
     word-wrap: break-word;
     align-self: flex-end;
-    
+
 } */

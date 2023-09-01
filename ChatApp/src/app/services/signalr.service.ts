@@ -4,6 +4,7 @@ import { HubConnection, HubConnectionBuilder } from '@microsoft/signalr';
 import { MessageDto } from 'Dto/MessageDto';
 import { Subject, Observable } from 'rxjs';
 import { EditMessageDto } from 'Dto/EditMessageDto';
+import { Message } from 'Dto/Message';
 // import { environment } from 'src/environments/environment';
 // import { Message } from 'Message.model';
 
@@ -18,6 +19,7 @@ export class SignalrService {
   private connectionPromise: Promise<void> | undefined;
   private sharedObj = new Subject<MessageDto>();
   private sharedEditedObj = new Subject<EditMessageDto>();
+ private sharedDeletedObj = new Subject<Message>();
 
   constructor() {
     this.hubConnection = new HubConnectionBuilder()
@@ -36,7 +38,7 @@ export class SignalrService {
       this.sharedObj.next(receivedMessageObject);
     });
 
-    this.startConnection();
+   
 
       this.hubConnection.on("ReceiveEdited", (editedMessage: any) => {
       const receivedEditedMessage: EditMessageDto = {
@@ -45,8 +47,15 @@ export class SignalrService {
        
       };
       this.sharedEditedObj.next(receivedEditedMessage);
+      });
+    
+    this.hubConnection.on("ReceiveDeleted", (deletedMessage: any) => {
+    // Handle the received deleted message here
+    console.log(`Received deleted message with ID ${deletedMessage.id}`);
+       this.sharedDeletedObj.next(deletedMessage);
     });
 
+     this.startConnection();
     
   }
 
@@ -133,6 +142,46 @@ export class SignalrService {
     }
   }
 
+   deleteMessage(messageId: number): void {
+    if (this.hubConnection.state === signalR.HubConnectionState.Connected) {
+      this.hubConnection.invoke('SendDeletedMessage', messageId)
+        .then(() => {
+          console.log('Deleted message sent successfully');
+        })
+        .catch((error) => {
+          console.error('Error sending deleted message:', error);
+        });
+    } else {
+      console.warn('SignalR connection is not established yet.');
+    }
+  }
+  
+
+
+
+  
+  onReceiveDeletedMessage(): void {
+    if (this.isConnectionEstablished) {
+      this.hubConnection.on('ReceiveDeleted', (deletedMessageId: any) => {
+        // Handle received deleted messages here
+        // ...
+
+        // Notify subscribers
+        this.sharedDeletedObj.next(deletedMessageId);
+      });
+    } else {
+      console.warn('SignalR connection is not established yet.');
+    }
+  }
+
+  // Add this method to retrieve deleted messages
+  public retrieveDeletedObject(): Subject<Message> {
+    return this.sharedDeletedObj;
+  }
+
+
+
+
   public retrieveMappedObject(): Subject<MessageDto> {
     return this.sharedObj;
   }
@@ -140,7 +189,10 @@ export class SignalrService {
    public retrieveEditedObject(): Subject<EditMessageDto> {
     return this.sharedEditedObj;
   }
-  
+
+  //  public retrieveDeletedObject(): Subject<Message> {
+  // return this.sharedDeletedObj;
 }
+// }
 
 

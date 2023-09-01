@@ -1,5 +1,5 @@
 export class MessageDto {
-  id: number;
+  id: string;
   senderId: string;
   receiverId: string;
   content: string;
@@ -8,6 +8,6 @@ export class MessageDto {
     this.senderId = '';
     this.receiverId = '';
     this.content = '';
-    this.id = 0;
+    this.id = '';
   }
 }

@@ -53,42 +53,56 @@ export class ConversationComponent implements OnInit {
       });
     });
 
+
+
   this.signalrService.retrieveMappedObject().subscribe((receivedMessage: MessageDto) => {
-    console.log('Received message:', receivedMessage);
+      console.log('Received message:', receivedMessage);
     
       this.signalrService.retrieveEditedObject().subscribe((receivedEditedMessage: EditMessageDto) => {
       console.log('Received edited message:', receivedEditedMessage);
      
     });
 
-  // Check if the received message already exists in the messages array
-  const existingMessage = this.messages.find(message => message.id === receivedMessage.id);
+     // Check if the received message already exists in the messages array
+    const existingMessage = this.messages.find(message => message.id === receivedMessage.id);
 
-  if (!existingMessage) {
-    this.messages.push(receivedMessage);
+    if (!existingMessage) {
+      this.messages.push(receivedMessage);
 
-    // Sort the messages array by timestamp in descending order
-    this.messages.sort((a, b) => b.timestamp - a.timestamp);
+      // Sort the messages array by timestamp in descending order
+        this.messages.sort((a, b) => b.timestamp - a.timestamp);
 
-    // You may also want to trigger change detection here
-    this.changeDetector.detectChanges();
-  }
+      // You may also want to trigger change detection here
+        this.changeDetector.detectChanges();
+    }
   });
     
-     this.signalrService.retrieveEditedObject().subscribe((receivedEditedMessage: EditMessageDto) => {
-    // Handle received edited messages
-       console.log('Received edited message:', receivedEditedMessage);
-         // Find the corresponding message in the 'messages' array by 'id'
-  const editedMessageIndex = this.messages.findIndex((m) => m.id === receivedEditedMessage.id);
+    
+  this.signalrService.retrieveEditedObject().subscribe((receivedEditedMessage: EditMessageDto) => {
+        // Handle received edited messages
+        console.log('Received edited message:', receivedEditedMessage);
+        // Find the corresponding message in the 'messages' array by 'id'
+  
+  
+    const editedMessageIndex = this.messages.findIndex((m) => m.id === receivedEditedMessage.id);
 
-  if (editedMessageIndex !== -1) {
-    // Update the content of the edited message
-    this.messages[editedMessageIndex].content = receivedEditedMessage.content;
+    if (editedMessageIndex !== -1) {
+      // Update the content of the edited message
+      this.messages[editedMessageIndex].content = receivedEditedMessage.content;
 
-    // Trigger Angular's change detection to update the UI
-    this.changeDetector.detectChanges();
-  }
-});
+      // Trigger Angular's change detection to update the UI
+      this.changeDetector.detectChanges();
+    }
+  });
+    
+    
+    this.signalrService.retrieveDeletedObject().subscribe((deletedMessageId: any) => {
+    // Find the message by ID and remove it from the 'messages' array
+    const index = this.messages.findIndex((message) => message.id === deletedMessageId);
+    if (index !== -1) {
+      this.messages.splice(index, 1);
+    }
+  });
     
     const savedMessages = localStorage.getItem('chatMessages');
     if (savedMessages) {
@@ -132,10 +146,6 @@ export class ConversationComponent implements OnInit {
 
           
           this.signalrService.sendMessage(message, response.senderId);
-
-
-         // this.messages.push(response);1234
-          // this.messageContent = '';
         },
         (error) => {
           console.error('Error sending message:', error);
@@ -205,29 +215,34 @@ export class ConversationComponent implements OnInit {
   }
 
   onAcceptDelete(message: any) {
-    this.chatService.deleteMessage(message.id).subscribe(
-      () => {
-        const index = this.messages.findIndex((m) => m.id === message.id);
-        if (index !== -1) {
-          this.messages.splice(index, 1); // Remove the message from the array
-        }
-      },
-      (error) => {
-        console.error('Error deleting message:', error);
-        // Handle the error if needed
+  this.chatService.deleteMessage(message.id).subscribe(
+    () => {
+      const index = this.messages.findIndex((m) => m.id === message.id);
+      if (index !== -1) {
+        this.messages.splice(index, 1); // Remove the message from the array
       }
-    );
-  }
+
+      // Send a delete request using SignalR
+      this.signalrService.deleteMessage(message.id);
+    },
+    (error) => {
+      console.error('Error deleting message:', error);
+     
+    }
+  );
+}
 
   onDeclineDelete(message: any) {
-    // Revert back to original content and close the inline editor
-    message.deleteMode = false;
+  // Revert back to the original content and close the inline editor
+  message.deleteMode = false;
   }
+  
 
   onDeleteMessage(message: any) {
-    if (message.senderId === this.currentUserId) {
-      message.deleteMode = true;
-      message.showContextMenu = true; // Add a property to control the context menu visibility
-    }
+  if (message.senderId !== this.currentReceiverId) {
+    message.deleteMode = true;
+    message.showContextMenu = true; 
   }
+}
+
 }

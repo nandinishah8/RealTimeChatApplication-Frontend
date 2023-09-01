@@ -7,7 +7,7 @@ import { SignalrService } from 'src/app/services/signalr.service';
 import { ChangeDetectorRef } from '@angular/core';
 import { NgZone } from '@angular/core';
 import { MessageDto } from 'Dto/MessageDto';
-//import { Message } from 'Message.model';
+
 import { EditMessageDto } from 'Dto/EditMessageDto';
 
 @Component({
@@ -56,9 +56,9 @@ export class ConversationComponent implements OnInit {
   this.signalrService.retrieveMappedObject().subscribe((receivedMessage: MessageDto) => {
     console.log('Received message:', receivedMessage);
     
-     this.signalrService.retrieveEditedObject().subscribe((editMessage: EditMessageDto) => {
-      // Handle the received edited message here
-      console.log('Received edited message:', editMessage);
+      this.signalrService.retrieveEditedObject().subscribe((receivedEditedMessage: EditMessageDto) => {
+      console.log('Received edited message:', receivedEditedMessage);
+     
     });
 
   // Check if the received message already exists in the messages array
@@ -73,9 +73,23 @@ export class ConversationComponent implements OnInit {
     // You may also want to trigger change detection here
     this.changeDetector.detectChanges();
   }
+  });
+    
+     this.signalrService.retrieveEditedObject().subscribe((receivedEditedMessage: EditMessageDto) => {
+    // Handle received edited messages
+       console.log('Received edited message:', receivedEditedMessage);
+         // Find the corresponding message in the 'messages' array by 'id'
+  const editedMessageIndex = this.messages.findIndex((m) => m.id === receivedEditedMessage.id);
+
+  if (editedMessageIndex !== -1) {
+    // Update the content of the edited message
+    this.messages[editedMessageIndex].content = receivedEditedMessage.content;
+
+    // Trigger Angular's change detection to update the UI
+    this.changeDetector.detectChanges();
+  }
 });
-
-
+    
     const savedMessages = localStorage.getItem('chatMessages');
     if (savedMessages) {
       this.messages = JSON.parse(savedMessages);
@@ -83,7 +97,7 @@ export class ConversationComponent implements OnInit {
   }
 
   getMessages(userId: string) {
-    //this.messages = [];
+   
     console.log(userId);
 
     this.chatService.getMessages(userId).subscribe((res) => {
@@ -137,30 +151,37 @@ export class ConversationComponent implements OnInit {
     this.sendMessage();
   }
 
+ 
   onAcceptEdit(message: any) {
-    // Update the message content with edited content
-    message.content = message.editedContent;
-    message.editMode = false;
-    console.log(message);
+  // Update the message content with edited content
+  message.content = message.editedContent;
+  message.editMode = false;
+  console.log(message);
 
-    this.chatService.editMessage(message.id, message.content).subscribe(
-      (res) => {
-        const editedMessageIndex = this.messages.findIndex(
-          (m) => m.id === message.id
-        );
-        if (editedMessageIndex !== -1) {
-          this.messages[editedMessageIndex].content = message.editedContent;
-          this.signalrService.EditMessage(message);
-        }
-
-      },
-      (error) => {
-        console.error('Error editing message:', error);
-        // Handle the error if needed
+  this.chatService.editMessage(message.id, message.content).subscribe(
+    (res) => {
+      const editedMessageIndex = this.messages.findIndex(
+        (m) => m.id === message.id
+      );
+      if (editedMessageIndex !== -1) {
+        this.messages[editedMessageIndex].content = message.editedContent;
+        
+        // Create an editMessage object with the edited content
+        const editMessage = new EditMessageDto(message.id, message.editedContent);
+        console.log(editMessage);
+        
+        // Send the edited message through SignalR
+        this.signalrService.EditMessage(editMessage);
       }
-    );
-  }
+    },
+    (error) => {
+      console.error('Error editing message:', error);
+      // Handle the error if needed
+    }
+  );
+}
 
+  
   onDeclineEdit(message: any) {
     // Revert back to original content and close the inline editor
     message.editMode = false;
@@ -179,7 +200,7 @@ export class ConversationComponent implements OnInit {
       console.log("hiii");
       message.editMode = true;
       message.editedContent = message.content;
-      message.showContextMenu = true; // Add a property to control the context menu visibility
+      message.showContextMenu = true; 
     }
   }
 

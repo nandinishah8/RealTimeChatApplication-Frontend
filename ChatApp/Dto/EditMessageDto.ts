@@ -1,8 +1,9 @@
+import { MessageDto } from './MessageDto';
 export class EditMessageDto {
-  id: number; 
+  id: any; 
   content: string; 
  
-  constructor(id: number, content: string) {
+  constructor(id: any, content: string) {
     this.id = id;
     this.content = content;
   

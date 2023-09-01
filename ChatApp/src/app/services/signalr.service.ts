@@ -11,11 +11,7 @@ import { EditMessageDto } from 'Dto/EditMessageDto';
   providedIn: 'root',
 })
 export class SignalrService {
-  // token = localStorage.getItem('authToken');
-  // private connection: any = new signalR.HubConnectionBuilder()
-  //   .withUrl(`https://localhost:7223/chat?token=${this.token}`)
-  //   .configureLogging(signalR.LogLevel.Information)
-  //   .build();
+ 
 
   private hubConnection: signalR.HubConnection;
   private isConnectionEstablished: boolean = false;
@@ -46,7 +42,7 @@ export class SignalrService {
       const receivedEditedMessage: EditMessageDto = {
         id: editedMessage.id,
         content: editedMessage.content
-        // Add other properties as needed
+       
       };
       this.sharedEditedObj.next(receivedEditedMessage);
     });
@@ -83,11 +79,7 @@ export class SignalrService {
     }
   }
 
-  // onReceiveMessage(callback: (message: any, senderId: string) => void) {
-  //   this.hubConnection.on('ReceiveOne', (message: any, senderId: string) => {
-  //     callback(message, senderId);
-  //   });
-  // }
+ 
 
   async onReceiveMessage( message: any, senderId: string)  {
     await this.connectionPromise;
@@ -101,8 +93,8 @@ export class SignalrService {
           receiverId: message.receiverId,
           content: message.content
         };
-        // callback(message, senderId);
-        //this.sharedObj.next(receivedMessageObject);
+        
+        this.sharedObj.next(receivedMessageObject);
       });
     } else {
       console.warn('SignalR connection is not established yet.');
@@ -124,15 +116,17 @@ export class SignalrService {
 }
 
    onReceiveEditedMessage(): void {
-    this.connectionPromise;
-   if (this.isConnectionEstablished) {
+     
+     this.connectionPromise;
+    if (this.isConnectionEstablished) {
       this.hubConnection.on('ReceiveEdited', (editMessage: any) => {
         console.log('Received Edited Message:', editMessage);
+        
         const receivedEditedMessage: EditMessageDto = {
         id: editMessage.id,
         content: editMessage.content
-        // Add other properties as needed
-      };
+        };
+        this.sharedEditedObj.next(receivedEditedMessage);
       });
     } else {
       console.warn('SignalR connection is not established yet.');
@@ -146,10 +140,6 @@ export class SignalrService {
    public retrieveEditedObject(): Subject<EditMessageDto> {
     return this.sharedEditedObj;
   }
-
-
- 
-
   
 }
 

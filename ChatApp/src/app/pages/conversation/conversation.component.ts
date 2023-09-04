@@ -24,6 +24,11 @@ export class ConversationComponent implements OnInit {
   incomingMessages: any[] = [];
   messages: any[] = [];
   messageContent: string = '';
+   selectedSort: string = 'timestamp'; 
+  selectedOrder: string = 'desc'; 
+   selectedCount: number = 10; // Initialize with default message count
+  selectedBefore: string = ''; // Initialize with empty "before" timestamp
+  selectedAfter: string = ''; // Initialize with empty "after" timestamp
 
   constructor(
     private route: ActivatedRoute,
@@ -44,7 +49,14 @@ export class ConversationComponent implements OnInit {
 
       console.log('currentReceiverId:', this.currentReceiverId);
 
-      this.getMessages(this.currentReceiverId);
+      this.getMessages(
+      this.currentReceiverId,
+      this.selectedSort,
+      this.selectedOrder,
+      this.selectedCount,
+      this.selectedBefore,
+      this.selectedAfter
+    );
 
       this.userService.retrieveUsers().subscribe((res) => {
         this.currentReceiver = res.find(
@@ -63,42 +75,34 @@ export class ConversationComponent implements OnInit {
      
     });
 
-     // Check if the received message already exists in the messages array
+    
     const existingMessage = this.messages.find(message => message.id === receivedMessage.id);
 
     if (!existingMessage) {
       this.messages.push(receivedMessage);
 
-      // Sort the messages array by timestamp in descending order
+      
         this.messages.sort((a, b) => b.timestamp - a.timestamp);
-
-      // You may also want to trigger change detection here
         this.changeDetector.detectChanges();
     }
   });
     
     
   this.signalrService.retrieveEditedObject().subscribe((receivedEditedMessage: EditMessageDto) => {
-        // Handle received edited messages
         console.log('Received edited message:', receivedEditedMessage);
-        // Find the corresponding message in the 'messages' array by 'id'
   
   
     const editedMessageIndex = this.messages.findIndex((m) => m.id === receivedEditedMessage.id);
 
     if (editedMessageIndex !== -1) {
-      // Update the content of the edited message
       this.messages[editedMessageIndex].content = receivedEditedMessage.content;
-
-      // Trigger Angular's change detection to update the UI
       this.changeDetector.detectChanges();
     }
   });
     
     
     this.signalrService.retrieveDeletedObject().subscribe((deletedMessageId: any) => {
-    // Find the message by ID and remove it from the 'messages' array
-    const index = this.messages.findIndex((message) => message.id === deletedMessageId);
+     const index = this.messages.findIndex((message) => message.id === deletedMessageId);
     if (index !== -1) {
       this.messages.splice(index, 1);
     }
@@ -110,17 +114,35 @@ export class ConversationComponent implements OnInit {
     }
   }
 
-  getMessages(userId: string) {
-   
-    console.log(userId);
+  getMessages(
+    userId: string,
+    sort: string,
+    order: string,
+    count: number,
+    before: string,
+    after: string
+  ) {
+    // Modify your getMessages function to accept filter parameters and send them to the chatService
+    this.chatService
+      .getMessages(userId, sort, order, count, before, after)
+      .subscribe((res) => {
+        this.messages = res;
 
-    this.chatService.getMessages(userId).subscribe((res) => {
-      console.log('getMessages response:', res);
-      this.messages = res;
+        console.log('getMessages messages:', this.messages);
+      });
+  }
 
-      
-      console.log('getMessages messages:', this.messages);
-    });
+  
+  applyFilters(): void {
+    // Call the getMessages function with the selected filter options
+    this.getMessages(
+      this.currentReceiverId,
+      this.selectedSort,
+      this.selectedOrder,
+      this.selectedCount,
+      this.selectedBefore,
+      this.selectedAfter
+    );
   }
 
   sendMessage() {

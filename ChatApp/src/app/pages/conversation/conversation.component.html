@@ -28,12 +28,41 @@
                 </div>
             </nav>
             <div class="chat-container">
+                <!-- Message Filters Section -->
+                <div class="message-filters">
+                    <label for="sort">Sort by:</label>
+                    <select [(ngModel)]="selectedSort">
+                        <option value="timestamp">Timestamp</option>
+                        <!-- Add more sorting options as needed -->
+                    </select>
+
+                    <label for="order">Order:</label>
+                    <select [(ngModel)]="selectedOrder">
+                        <option value="asc">Ascending</option>
+                        <option value="desc">Descending</option>
+                    </select>
+
+                    <label for="count">Message Count:</label>
+                    <select [(ngModel)]="selectedCount">
+                        <option value="10">10</option>
+                        <option value="20">20</option>
+                        <!-- Add more count options as needed -->
+                    </select>
+
+                    <label for="before">Before:</label>
+                    <input type="datetime-local" [(ngModel)]="selectedBefore" name="before" />
+
+                    <label for="after">After:</label>
+                    <input type="datetime-local" [(ngModel)]="selectedAfter" name="after" />
+
+                    <button (click)="applyFilters()">Apply Filters</button>
+                </div>
                 <div class="chat-messages" style="height: 492px;">
                     <div [ngClass]="{'chat-message outgoing': message?.senderId !== currentReceiverId, 'chat-message incoming': message?.senderId === currentReceiverId}"
                         *ngFor="let message of messages" (contextmenu)="onContextMenu($event, message)">
                         <span class="message-content" *ngIf="!message.editMode && !message.deleteMode">
                             <p>{{message.content}} </p>
-                            <p>{{ message.timestamp | date:'shortTime' }}</p>
+                            <p>{{ message.timestamp }}</p>
                         </span>
                         <div *ngIf="message.isEvent && !message.editMode && !message.deleteMode" class="editor-actions">
                             <button class="edit-button" (click)="onEditMessage(message)">
@@ -72,4 +101,6 @@
             </div>
         </div>
     </div>
+
+
 </body>

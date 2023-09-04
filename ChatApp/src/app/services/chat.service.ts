@@ -19,40 +19,19 @@ export class ChatService {
       "receiverId": receiverId,
       "content": content,
     };
-    // return this.http.post(this.url, body, { headers: headers }).pipe(
-    //   map((response: any) => {
-    //     console.log('sendMessage response:', response);
-    //     return response.messages;
-    //   })
-    // );
-
+   
     return this.http.post<any>(this.url, body, { headers: headers });
   }
 
-  // getMessages(id: number): Observable<any[]> {
-  //   let token = localStorage.getItem('auth_token');
-  //   console.log(token);
-
-  //   const headers = new HttpHeaders({
-  //     'Content-Type': 'application/json',
-  //     Authorization: `Bearer ${token}`,
-  //   });
-
-  //   console.log(id);
-
-  //   return this.http
-  //     .get<any[]>(`http://localhost:5243/api/Messages/${id}`, {
-  //       headers: headers,
-  //     })
-  //     .pipe(
-  //       map((response: any) => {
-  //         console.log('getMessages response:', response);
-  //         return response.messages;
-  //       })
-  //     );
-  // }
-
-  getMessages(userId: string): Observable<any[]> {
+  
+ getMessages(
+    userId: string,
+    sort: string,
+    order: string,
+    count: number,
+    before: string,
+    after: string
+  ): Observable<any[]> {
     let token = localStorage.getItem('auth_token');
     console.log(token);
 
@@ -61,10 +40,24 @@ export class ChatService {
       Authorization: `Bearer ${token}`,
     });
 
+    let params = new HttpParams()
+      .set('sort', sort)
+      .set('order', order)
+      .set('count', count.toString());
+
+    if (before) {
+      params = params.set('before', before);
+    }
+
+    if (after) {
+      params = params.set('after', after);
+    }
+
     console.log(userId);
     return this.http
       .get<any[]>(`http://localhost:5243/api/Messages?UserId=${userId}`, {
         headers: headers,
+        params: params
       })
       .pipe(
         map((response: any) => {
@@ -79,7 +72,7 @@ export class ChatService {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${this.user.getToken()}`,
     });
-    // const body = { message: content };
+   
 
     return this.http.put<any>(
       `${this.url}/${messageId}`,

@@ -26,8 +26,6 @@
                     </a>
                     <strong style="color: white;">{{ currentReceiver?.Name }}</strong>
                 </div>
-            </nav>
-            <div class="chat-container">
                 <!-- Message Filters Section -->
                 <div class="message-filters">
                     <label for="sort">Sort by:</label>
@@ -57,6 +55,9 @@
 
                     <button (click)="applyFilters()">Apply Filters</button>
                 </div>
+            </nav>
+            <div class="chat-container">
+
                 <div class="chat-messages" style="height: 492px;">
                     <div [ngClass]="{'chat-message outgoing': message?.senderId !== currentReceiverId, 'chat-message incoming': message?.senderId === currentReceiverId}"
                         *ngFor="let message of messages" (contextmenu)="onContextMenu($event, message)">

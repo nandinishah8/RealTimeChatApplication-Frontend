@@ -82,23 +82,6 @@ strong {
 }
 
 
-/* .chat-message {
-    display: flex;
-    flex-direction: column;
-    padding: 10px;
-    flex-grow: 1;
-    overflow-y: auto;
-}
-
-.chat-message {
- 
-    padding: 8px;
-    border-radius: 8px;
-    max-width: 80%;
-    margin: 4px 0;
-    max-width: fit-content;
-    align-self: flex-end;
-} */
 
 /* Chat messages container */
 .chat-messages {
@@ -157,7 +140,7 @@ strong {
     cursor: pointer;
 }
 
-/* Styles for the editor container */
+
 /* Message editor container styles */
 .message-editor-container {
     display: flex;
@@ -207,28 +190,34 @@ input[type="text"] {
     cursor: pointer;
 }
 
-/* .message-content {
-    display: flex;
-    justify-content: flex-start;
-
-    margin-bottom: 10px;
-} */
-
-/* .received-message {
+.message-filters {
     background-color: #f0f0f0;
-    padding: 8px;
-    border-radius: 8px;
-    max-width: 70%;
-    word-wrap: break-word;
-} */
+    padding: 10px;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
 
-/* .sent-message {
+.message-filters label {
+    margin-right: 10px;
+    font-weight: bold;
+    color: #333;
+}
+
+.message-filters select,
+.message-filters input[type="datetime-local"] {
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin-right: 10px;
+}
+
+.message-filters button {
     background-color: #007bff;
-    color: white;
-    padding: 8px;
-    border-radius: 8px;
-    max-width: 70%;
-    word-wrap: break-word;
-    align-self: flex-end;
-
-} */
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    padding: 5px 10px;
+    cursor: pointer;
+}

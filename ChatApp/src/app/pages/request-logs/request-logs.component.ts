@@ -7,7 +7,7 @@ import { LogsService } from 'src/app/services/logs.service';
   styleUrls: ['./request-logs.component.css'],
 })
 export class RequestLogsComponent {
-  logs: any[] = [];
+ logs: any[] = [];
   selectedTimeframe: string = 'last5mins';
   customStartTime: string = '';
   customEndTime: string = '';
@@ -25,31 +25,18 @@ export class RequestLogsComponent {
     this.getLogs();
   }
 
-  getLogs(): void {
-    if (this.selectedTimeframe === 'last5mins') {
-      const now = new Date().getTime();
-      const startTime = new Date(now - 5 * 60 * 1000).toISOString();
-      const endTime = new Date(now).toISOString();
+
+  
+   getLogs(): void {
+    if (this.selectedTimeframe === 'custom') {
+      if (this.customStartTime && this.customEndTime) {
+        this.logsService
+          .getLogsCustom(this.customStartTime, this.customEndTime)
+          .subscribe((logs) => (this.logs = logs));
+      }
+    } else {
       this.logsService
-        .getLogs(startTime, endTime)
-        .subscribe((logs) => (this.logs = logs));
-    } else if (this.selectedTimeframe === 'last10mins') {
-      const now = new Date().getTime();
-      const startTime = new Date(now - 10 * 60 * 1000).toISOString();
-      const endTime = new Date(now).toISOString();
-      this.logsService
-        .getLogs(startTime, endTime)
-        .subscribe((logs) => (this.logs = logs));
-    } else if (this.selectedTimeframe === 'last30mins') {
-      const now = new Date().getTime();
-      const startTime = new Date(now - 30 * 60 * 1000).toISOString();
-      const endTime = new Date(now).toISOString();
-      this.logsService
-        .getLogs(startTime, endTime)
-        .subscribe((logs) => (this.logs = logs));
-    } else if (this.selectedTimeframe === 'custom') {
-      this.logsService
-        .getLogs(this.customStartTime, this.customEndTime)
+        .getLogsByTimeframe(this.selectedTimeframe)
         .subscribe((logs) => (this.logs = logs));
     }
   }

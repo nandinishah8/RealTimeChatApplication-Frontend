@@ -11,25 +11,20 @@ export class LogsService {
   url = 'http://localhost:5243/api/Log';
   constructor(private http: HttpClient, private user: UserService) {}
 
-  getLogs(startTime?: string, endTime?: string): Observable<any[]> {
-    const headers = new HttpHeaders({
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${this.user.getToken()}`,
-    });
-    let params = new HttpParams();
 
-    if (startTime) {
-      params = params.set('startTime', startTime);
-    }
-
-    if (endTime) {
-      params = params.set('endTime', endTime);
-    }
-
+  
+ getLogsByTimeframe(timeframe: string): Observable<any[]> {
     return this.http
-      .get<any[]>(this.url, { headers: headers, params: params })
-      .pipe(
-        map((response: any) => response.logs) // Extract the 'logs' array from the response
-      );
+      .get<any[]>(`${this.url}`)
+      .pipe(map((response: any) => response.logs));
+  }
+
+   getLogsCustom(startTime: string, endTime: string): Observable<any[]> {
+    return this.http.get<any[]>(`${this.url}`, {
+      params: {
+        startTime: startTime,
+        endTime: endTime,
+      },
+    });
   }
 }

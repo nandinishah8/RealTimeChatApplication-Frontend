@@ -36,7 +36,7 @@ body {
 .navbar {
     background-color: whitesmoke;
     color: white;
-    padding: 10px;
+    padding: 0px;
     display: flex;
     align-items: center;
 }
@@ -176,7 +176,7 @@ input[type="text"] {
     flex: 1;
     border: 1px solid #ccc;
     border-radius: 4px;
-    padding: 8px;
+    padding: 3px;
 }
 
 /* Styles for the send button */
@@ -192,8 +192,8 @@ input[type="text"] {
 
 .message-filters {
     background-color: #f0f0f0;
-    padding: 10px;
-    margin-bottom: 10px;
+    padding: 2px;
+    margin-bottom: 5px;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -221,3 +221,5 @@ input[type="text"] {
     padding: 5px 10px;
     cursor: pointer;
 }
+
+/* Add this CSS to your conversation.component.css */

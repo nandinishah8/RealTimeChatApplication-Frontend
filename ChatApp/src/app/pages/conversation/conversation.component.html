@@ -15,6 +15,10 @@
         </div> -->
 
         <div id="chat-window">
+            <div class="message-search">
+                <input type="text" placeholder="Search messages..." [(ngModel)]="searchQuery" />
+                <button (click)="searchMessages()">Search</button>
+            </div>
             <nav class="navbar">
                 <div class="container-fluid" style="justify-content: start;">
                     <a class="navbar-brand">
@@ -26,12 +30,13 @@
                     </a>
                     <strong style="color: white;">{{ currentReceiver?.Name }}</strong>
                 </div>
+
                 <!-- Message Filters Section -->
                 <div class="message-filters">
                     <label for="sort">Sort by:</label>
                     <select [(ngModel)]="selectedSort">
                         <option value="timestamp">Timestamp</option>
-                        <!-- Add more sorting options as needed -->
+
                     </select>
 
                     <label for="order">Order:</label>
@@ -40,11 +45,11 @@
                         <option value="desc">Descending</option>
                     </select>
 
-                    <label for="count">Message Count:</label>
+                    <label for="count">Count:</label>
                     <select [(ngModel)]="selectedCount">
                         <option value="10">10</option>
                         <option value="20">20</option>
-                        <!-- Add more count options as needed -->
+
                     </select>
 
                     <label for="before">Before:</label>
@@ -55,6 +60,7 @@
 
                     <button (click)="applyFilters()">Apply Filters</button>
                 </div>
+
             </nav>
             <div class="chat-container">
 
@@ -63,7 +69,7 @@
                         *ngFor="let message of messages" (contextmenu)="onContextMenu($event, message)">
                         <span class="message-content" *ngIf="!message.editMode && !message.deleteMode">
                             <p>{{message.content}} </p>
-                            <p>{{ message.timestamp }}</p>
+                            <p>{{ message.timestamp | date }}</p>
                         </span>
                         <div *ngIf="message.isEvent && !message.editMode && !message.deleteMode" class="editor-actions">
                             <button class="edit-button" (click)="onEditMessage(message)">

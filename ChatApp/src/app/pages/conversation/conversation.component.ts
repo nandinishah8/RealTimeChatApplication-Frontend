@@ -26,9 +26,10 @@ export class ConversationComponent implements OnInit {
   messageContent: string = '';
    selectedSort: string = 'timestamp'; 
   selectedOrder: string = 'desc'; 
-   selectedCount: number = 10; // Initialize with default message count
-  selectedBefore: string = ''; // Initialize with empty "before" timestamp
-  selectedAfter: string = ''; // Initialize with empty "after" timestamp
+   selectedCount: number = 10; 
+  selectedBefore: string = '';
+  selectedAfter: string = ''; 
+  searchQuery: string = '';
 
   constructor(
     private route: ActivatedRoute,
@@ -143,6 +144,19 @@ export class ConversationComponent implements OnInit {
       this.selectedBefore,
       this.selectedAfter
     );
+  }
+
+  searchMessages(): void {
+    if (this.searchQuery.trim() === '') {
+      // Don't search with an empty query
+      return;
+    }
+
+    this.chatService.searchMessages(this.searchQuery).subscribe((res) => {
+      this.messages = res;
+
+      console.log('Search results:', this.messages);
+    });
   }
 
   sendMessage() {

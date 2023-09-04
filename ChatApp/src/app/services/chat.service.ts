@@ -67,6 +67,20 @@ export class ChatService {
       );
   }
 
+   searchMessages(query: string): Observable<any[]> {
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${this.user.getToken()}`,
+    });
+
+    const params = new HttpParams().set('result', query);
+
+    return this.http.get<any[]>(`${this.url}/search/${query}`, {
+      headers: headers,
+      params: params,
+    });
+  }
+
   editMessage(messageId: number, content: string): Observable<any> {
     const headers = new HttpHeaders({
       'Content-Type': 'application/json',

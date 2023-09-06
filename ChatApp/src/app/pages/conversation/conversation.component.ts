@@ -30,6 +30,7 @@ export class ConversationComponent implements OnInit {
   selectedBefore: string = '';
   selectedAfter: string = ''; 
   searchQuery: string = '';
+  unreadMessageCount: number = 0;
 
   constructor(
     private route: ActivatedRoute,
@@ -49,6 +50,8 @@ export class ConversationComponent implements OnInit {
       this.currentReceiverId = userId;
 
       console.log('currentReceiverId:', this.currentReceiverId);
+
+      this.markMessagesAsSeen(this.currentReceiverId);
 
       this.getMessages(
       this.currentReceiverId,
@@ -87,6 +90,16 @@ export class ConversationComponent implements OnInit {
         this.changeDetector.detectChanges();
     }
   });
+    
+    this.userService.getReadUnreadMessageCounts(this.currentUserId).subscribe(
+    (unreadCounts) => {
+      // Update the unread message count in your component's data
+      this.unreadMessageCount = unreadCounts.unreadCount;
+    },
+    (error) => {
+      console.error('Error fetching unread message count:', error);
+    }
+  );
     
     
   this.signalrService.retrieveEditedObject().subscribe((receivedEditedMessage: EditMessageDto) => {
@@ -279,6 +292,19 @@ export class ConversationComponent implements OnInit {
     message.deleteMode = true;
     message.showContextMenu = true; 
   }
-}
+  }
+  
+  markMessagesAsSeen(receiverId: string) {
+  this.chatService.markMessagesAsSeen(this.currentUserId, receiverId).subscribe(
+    () => {
+      // Handle the success response if needed
+    },
+    (error) => {
+      console.error('Error marking messages as seen:', error);
+    }
+  );
+  }
+
+  
 
 }

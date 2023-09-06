@@ -3,6 +3,7 @@ import { Router, Route } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { HttpErrorResponse } from '@angular/common/http';
 import { UserService } from 'src/app/services/user.service';
+import { ChatService } from '../../services/chat.service';
 import {
   FormGroup,
   FormBuilder,
@@ -18,18 +19,36 @@ import {
 export class ChatComponent implements OnInit {
   users: any[] = [];
   currentReceiver: any;
+  unreadMessageCount: number = 0;
+  updateUnreadMessageCount(count: number) {
+    this.unreadMessageCount = count;
+  }
 
-  constructor(private userService: UserService, private router: Router) {}
+  constructor(private userService: UserService, private router: Router, private ChatService: ChatService) {}
 
   ngOnInit(): void {
+
+
     console.log('Initializing component...');
 
+    
+    // this.userService.retrieveUsersWithUnreadCounts().subscribe(
+    //   (res) => {
+    //     this.users = res;
+    //   },
+    //   (error) => {
+    //     console.error('Error fetching users:', error);
+    //   }
+    //   );
+
+    this.loadUsersWithUnreadCounts();
+      
     this.userService.retrieveUsers().subscribe(
       (res) => {
         console.log('Received users:', res);
         console.log('Is res an array?', Array.isArray(res));
 
-        this.users = res; // Make sure this is a properly populated array
+        this.users = res; 
         console.log('this.users:', this.users);
 
         if (Array.isArray(this.users)) {
@@ -49,6 +68,8 @@ export class ChatComponent implements OnInit {
         console.error('Error fetching users:', error);
       }
     );
+
+    
   }
 
   onUserClick(user: any) {
@@ -60,4 +81,18 @@ export class ChatComponent implements OnInit {
   showMessage(id: string) {
     this.router.navigate(['/chat', { outlets: { childPopup: ['user', id] } }]);
   }
+
+
+  loadUsersWithUnreadCounts() {
+  this.ChatService.getUsersWithUnreadCounts().subscribe(
+    (usersWithCounts) => {
+      this.users = usersWithCounts;
+    },
+    (error) => {
+      console.error('Error fetching users with unread counts:', error);
+    }
+  );
+}
+  
+   
 }

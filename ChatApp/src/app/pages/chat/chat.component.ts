@@ -32,16 +32,6 @@ export class ChatComponent implements OnInit {
     console.log('Initializing component...');
 
     
-    // this.userService.retrieveUsersWithUnreadCounts().subscribe(
-    //   (res) => {
-    //     this.users = res;
-    //   },
-    //   (error) => {
-    //     console.error('Error fetching users:', error);
-    //   }
-    //   );
-
-    this.loadUsersWithUnreadCounts();
       
     this.userService.retrieveUsers().subscribe(
       (res) => {
@@ -59,18 +49,26 @@ export class ChatComponent implements OnInit {
           this.users.forEach((user) => {
             console.log('User name:', user.name);
             console.log('User email:', user.email);
-          });
-        } else {
-          console.error('this.users is not an array.');
-        }
-      },
-      (error) => {
-        console.error('Error fetching users:', error);
-      }
-    );
 
-    
-  }
+            this.ChatService.getUsersWithUnreadCounts(user.UserId).subscribe(
+            (count) => {
+              user.unreadMessageCount = count; 
+            },
+            (error) => {
+              console.error('Error fetching unread message count:', error);
+            }
+          );
+        });
+      } else {
+        console.error('this.users is not an array.');
+      }
+    },
+    (error) => {
+      console.error('Error fetching users:', error);
+    }
+  );
+}
+ 
 
   onUserClick(user: any) {
     console.log(user);
@@ -83,16 +81,16 @@ export class ChatComponent implements OnInit {
   }
 
 
-  loadUsersWithUnreadCounts() {
-  this.ChatService.getUsersWithUnreadCounts().subscribe(
-    (usersWithCounts) => {
-      this.users = usersWithCounts;
-    },
-    (error) => {
-      console.error('Error fetching users with unread counts:', error);
-    }
-  );
-}
+//   loadUsersWithUnreadCounts() {
+//   this.ChatService.getUsersWithUnreadCounts().subscribe(
+//     (usersWithCounts) => {
+//       this.users = usersWithCounts;
+//     },
+//     (error) => {
+//       console.error('Error fetching users with unread counts:', error);
+//     }
+//   );
+// }
   
    
 }

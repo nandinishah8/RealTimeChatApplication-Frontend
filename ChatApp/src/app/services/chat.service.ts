@@ -110,18 +110,18 @@ export class ChatService {
   }
 
 
-  markMessagesAsSeen(currentUserId: string, receiverId: string): Observable<any> {
-  const headers = new HttpHeaders({
-    'Content-Type': 'application/json',
-    Authorization: `Bearer ${this.user.getToken()}`,
-  });
-  const body = {
-    currentUserId,
-    receiverId,
-  };
+  // markMessagesAsSeen(currentUserId: string, receiverId: string): Observable<any> {
+  // const headers = new HttpHeaders({
+  //   'Content-Type': 'application/json',
+  //   Authorization: `Bearer ${this.user.getToken()}`,
+  // });
+  // const body = {
+  //   currentUserId,
+  //   receiverId,
+  // };
 
-  return this.http.post<any>(`${this.url}/mark-seen`, body, { headers: headers });
-}
+//   return this.http.post<any>(`${this.url}/mark-seen`, body, { headers: headers });
+// }
 
 // getReadUnreadMessageCounts(userId: string): Observable<any> {
 //   const headers = new HttpHeaders({
@@ -132,13 +132,13 @@ export class ChatService {
 //   return this.http.get<any>(`${this.url}/read-unread-counts/${userId}`, { headers: headers });
 // }
   
-  getUsersWithUnreadCounts(userId: string): Observable<any[]> {
-  const headers = new HttpHeaders({
-    'Content-Type': 'application/json',
-    Authorization: `Bearer ${this.user.getToken()}`,
-  });
+//   getUsersWithUnreadCounts(userId: string): Observable<any[]> {
+//   const headers = new HttpHeaders({
+//     'Content-Type': 'application/json',
+//     Authorization: `Bearer ${this.user.getToken()}`,
+//   });
 
-  return this.http.get<any>(`${this.url}/read-unread-counts/${userId}`, { headers: headers });
-}
+//   return this.http.get<any>(`${this.url}/read-unread-counts/${userId}`, { headers: headers });
+// }
 
 }

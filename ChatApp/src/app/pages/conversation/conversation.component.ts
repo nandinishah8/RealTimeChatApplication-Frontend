@@ -51,7 +51,7 @@ export class ConversationComponent implements OnInit {
 
       console.log('currentReceiverId:', this.currentReceiverId);
 
-      this.markMessagesAsSeen(this.currentReceiverId);
+     
 
       this.getMessages(
       this.currentReceiverId,
@@ -91,15 +91,7 @@ export class ConversationComponent implements OnInit {
     }
   });
     
-    this.userService.getReadUnreadMessageCounts(this.currentUserId).subscribe(
-    (unreadCounts) => {
-      // Update the unread message count in your component's data
-      this.unreadMessageCount = unreadCounts.unreadCount;
-    },
-    (error) => {
-      console.error('Error fetching unread message count:', error);
-    }
-  );
+   
     
     
   this.signalrService.retrieveEditedObject().subscribe((receivedEditedMessage: EditMessageDto) => {
@@ -129,6 +121,7 @@ export class ConversationComponent implements OnInit {
   }
 
   getMessages(
+    //conversationId: string,
     userId: string,
     sort: string,
     order: string,
@@ -294,16 +287,7 @@ export class ConversationComponent implements OnInit {
   }
   }
   
-  markMessagesAsSeen(receiverId: string) {
-  this.chatService.markMessagesAsSeen(this.currentUserId, receiverId).subscribe(
-    () => {
-      // Handle the success response if needed
-    },
-    (error) => {
-      console.error('Error marking messages as seen:', error);
-    }
-  );
-  }
+ 
 
   
 

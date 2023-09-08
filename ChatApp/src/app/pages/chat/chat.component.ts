@@ -20,9 +20,7 @@ export class ChatComponent implements OnInit {
   users: any[] = [];
   currentReceiver: any;
   unreadMessageCount: number = 0;
-  updateUnreadMessageCount(count: number) {
-    this.unreadMessageCount = count;
-  }
+  
 
   constructor(private userService: UserService, private router: Router, private ChatService: ChatService) {}
 
@@ -50,14 +48,7 @@ export class ChatComponent implements OnInit {
             console.log('User name:', user.name);
             console.log('User email:', user.email);
 
-            this.ChatService.getUsersWithUnreadCounts(user.UserId).subscribe(
-            (count) => {
-              user.unreadMessageCount = count; 
-            },
-            (error) => {
-              console.error('Error fetching unread message count:', error);
-            }
-          );
+           
         });
       } else {
         console.error('this.users is not an array.');
@@ -81,16 +72,5 @@ export class ChatComponent implements OnInit {
   }
 
 
-//   loadUsersWithUnreadCounts() {
-//   this.ChatService.getUsersWithUnreadCounts().subscribe(
-//     (usersWithCounts) => {
-//       this.users = usersWithCounts;
-//     },
-//     (error) => {
-//       console.error('Error fetching users with unread counts:', error);
-//     }
-//   );
-// }
-  
-   
+
 }

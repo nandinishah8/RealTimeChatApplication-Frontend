@@ -20,8 +20,8 @@ export class SignalrService {
   private sharedObj = new Subject<MessageDto>();
   private sharedEditedObj = new Subject<EditMessageDto>();
   private sharedDeletedObj = new Subject<Message>();
-  private unreadMessageCount: number = 0;
-  currentUserId!: string;
+ 
+ 
   
 
   constructor() {
@@ -41,12 +41,7 @@ export class SignalrService {
       this.sharedObj.next(receivedMessageObject);
     });
 
-    this.hubConnection.on("UnreadMessageCount", (userId: string, count: number) => {
-      // Update the unread message count when a new count arrives
-      if (userId === this.currentUserId) {
-        this.unreadMessageCount = count;
-      }
-    });
+   
   
       this.hubConnection.on("ReceiveEdited", (editedMessage: any) => {
       const receivedEditedMessage: EditMessageDto = {
@@ -178,19 +173,7 @@ export class SignalrService {
     }
   }
 
-   public async MarkMessagesAsSeen(userId: string) {
-    // Implement logic to mark messages as seen for the user
-    // You should update your database or any other data source here
-
-    // Calculate unread message count for the user and send it
-    const unreadMessageCount = await this._messageService.GetUnreadMessageCount(userId);
-    this.hubConnection.invoke('MarkMessagesAsSeen', userId);
-  }
-
-  // Add a getter method to access the unread message count
-  getUnreadMessageCount(): number {
-    return this.unreadMessageCount;
-  }
+ 
 
   // Add this method to retrieve deleted messages
   public retrieveDeletedObject(): Subject<Message> {

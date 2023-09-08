@@ -45,13 +45,7 @@ export class UserService {
     return this.http.get<any[]>(this.url, { headers: headers });
   }
 
-//   retrieveUsersWithUnreadCounts(): Observable<any[]> {
-//   const headers = new HttpHeaders({
-//     'Content-Type': 'application/json',
-//     Authorization: `Bearer ${this.getToken()}`,
-//   });
-//   return this.http.get<any[]>(`${this.url}/with-unread-counts`, { headers: headers });
-// }
+
 
 
   getLoggedInUser(): number {
@@ -64,15 +58,6 @@ export class UserService {
     return +id;
   }
 
-   getReadUnreadMessageCounts(userId: string): Observable<any> {
-    const headers = new HttpHeaders({
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${this.getToken()}`,
-    });
-
-    return this.http.get<any>(`http://localhost:5243/api/Messages/read-unread-counts/${userId}`, {
-      headers: headers,
-    });
-  }
+  
 }
 

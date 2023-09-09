@@ -10,6 +10,7 @@ import {
   AbstractControl,
   Validators,
 } from '@angular/forms';
+import { Message } from 'Dto/Message';
 
 @Component({
   selector: 'app-chat',
@@ -69,6 +70,7 @@ export class ChatComponent implements OnInit {
 
   showMessage(id: string) {
     this.router.navigate(['/chat', { outlets: { childPopup: ['user', id] } }]);
+    
   }
 
 

@@ -221,3 +221,15 @@ input[type="text"] {
     padding: 5px 10px;
     cursor: pointer;
 }
+
+.seen-message {
+
+    background-color: pink;
+
+}
+
+.unseen-message {
+
+    background-color: #ffffff;
+
+}

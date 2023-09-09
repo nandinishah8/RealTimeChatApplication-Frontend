@@ -65,11 +65,12 @@
             <div class="chat-container">
 
                 <div class="chat-messages" style="height: 492px;">
-                    <div [ngClass]="{'chat-message outgoing': message?.senderId !== currentReceiverId, 'chat-message incoming': message?.senderId === currentReceiverId}"
+                    <div [ngClass]="{'chat-message outgoing': message?.senderId !== currentReceiverId, 'chat-message incoming': message?.senderId === currentReceiverId, 'seen-message': message.seen}"
                         *ngFor="let message of messages" (contextmenu)="onContextMenu($event, message)">
                         <span class="message-content" *ngIf="!message.editMode && !message.deleteMode">
                             <p>{{message.content}} </p>
                             <p>{{ message.timestamp | date }}</p>
+                            <p>{{message.seen}}</p>
                         </span>
                         <div *ngIf="message.isEvent && !message.editMode && !message.deleteMode" class="editor-actions">
                             <button class="edit-button" (click)="onEditMessage(message)">

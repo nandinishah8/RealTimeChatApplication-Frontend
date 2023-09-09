@@ -286,9 +286,4 @@ export class ConversationComponent implements OnInit {
     message.showContextMenu = true; 
   }
   }
-  
- 
-
-  
-
 }

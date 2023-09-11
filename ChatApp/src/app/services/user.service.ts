@@ -45,6 +45,9 @@ export class UserService {
     return this.http.get<any[]>(this.url, { headers: headers });
   }
 
+
+
+
   getLoggedInUser(): number {
     const decodedToken: any = jwt_decode(this.getToken()!.toString());
     const id =
@@ -54,4 +57,7 @@ export class UserService {
 
     return +id;
   }
+
+  
 }
+

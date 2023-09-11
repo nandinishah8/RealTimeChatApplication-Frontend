@@ -5,8 +5,6 @@ import { MessageDto } from 'Dto/MessageDto';
 import { Subject, Observable } from 'rxjs';
 import { EditMessageDto } from 'Dto/EditMessageDto';
 import { Message } from 'Dto/Message';
-// import { environment } from 'src/environments/environment';
-// import { Message } from 'Message.model';
 
 @Injectable({
   providedIn: 'root',
@@ -19,39 +17,73 @@ export class SignalrService {
   private connectionPromise: Promise<void> | undefined;
   private sharedObj = new Subject<MessageDto>();
   private sharedEditedObj = new Subject<EditMessageDto>();
- private sharedDeletedObj = new Subject<Message>();
+  private sharedDeletedObj = new Subject<Message>();
+  private messageSeenSubject: Subject<string> = new Subject<string>();
+  private unreadMessageCountSubject = new Subject<number>();
+  // public unreadMessageCount$ = this.unreadMessageCountSubject.asObservable();
+  public unreadMessageCount$: Observable<number> = this.unreadMessageCountSubject.asObservable();
+  private unreadMessageCount: number = 0;
+
+ 
+ 
+  
 
   constructor() {
     this.hubConnection = new HubConnectionBuilder()
       .withUrl('http://localhost:5243/chatHub') 
       .withAutomaticReconnect()
       .build();
+    
+     this.unreadMessageCount = 0;
 
     
-    this.hubConnection.on("ReceiveOne", (message: any, senderId: any) => {
+     this.hubConnection.on("ReceiveOne", (message: any, senderId: any) => {
+      // Handle received messages
       const receivedMessageObject: MessageDto = {
         id: message.id,
         senderId: senderId,
         receiverId: message.receiverId,
-        content: message.content
+        content: message.content,
+        seen: message.seen,
       };
+
+       if (!receivedMessageObject.seen) {
+        this.unreadMessageCount++;
+        this.unreadMessageCountSubject.next(this.unreadMessageCount);
+      }
+
       this.sharedObj.next(receivedMessageObject);
+     });
+    
+    
+    
+     this.hubConnection.on('messageSeen', (messageId: string) => {
+      this.messageSeenSubject.next(messageId);
+    });
+  
+     this.hubConnection.on("UpdateUnreadCount", (count: number) => {
+        // Update the count and notify subscribers.
+       this.unreadMessageCountSubject.next(count);
+       console.log(count);
     });
 
    
-
-      this.hubConnection.on("ReceiveEdited", (editedMessage: any) => {
-      const receivedEditedMessage: EditMessageDto = {
+  
+    this.hubConnection.on("ReceiveEdited", (editedMessage: any) =>
+    {
+      const receivedEditedMessage: EditMessageDto =
+      {
         id: editedMessage.id,
         content: editedMessage.content
        
       };
       this.sharedEditedObj.next(receivedEditedMessage);
-      });
+    });
     
-    this.hubConnection.on("ReceiveDeleted", (deletedMessage: any) => {
-    // Handle the received deleted message here
-    console.log(`Received deleted message with ID ${deletedMessage.id}`);
+    this.hubConnection.on("ReceiveDeleted", (deletedMessage: any) =>
+    {
+      // Handle the received deleted message here
+      console.log(`Received deleted message with ID ${deletedMessage.id}`);
        this.sharedDeletedObj.next(deletedMessage);
     });
 
@@ -59,14 +91,19 @@ export class SignalrService {
     
   }
 
-  async startConnection(): Promise<void> {
-    try {
+  async startConnection(): Promise<void>
+  {
+    try
+    {
       await this.hubConnection.start();
       console.log('SignalR Connection started');
       this.isConnectionEstablished = true;
       const connectionId = this.hubConnection.connectionId;
       console.log('Connection ID:', connectionId);
-    } catch (error) {
+    }
+    
+    catch (error)
+    {
       console.error('Error starting SignalR connection:', error);
       throw error;
     }
@@ -74,7 +111,7 @@ export class SignalrService {
 
   
 
- sendMessage(message: any, senderId: any): void {
+  sendMessage(message: any, senderId: any): void {
     if (this.hubConnection.state === signalR.HubConnectionState.Connected) {
       this.hubConnection.invoke('SendMessage', message, senderId)
         .then(() => {
@@ -90,7 +127,8 @@ export class SignalrService {
 
  
 
-  async onReceiveMessage( message: any, senderId: string)  {
+  async onReceiveMessage(message: any, senderId: string)
+  {
     await this.connectionPromise;
     if (this.isConnectionEstablished) {
       this.hubConnection.on('ReceiveOne', (message: any, senderId: any) => {
@@ -100,35 +138,48 @@ export class SignalrService {
           id: message.id,
           senderId: senderId,
           receiverId: message.receiverId,
-          content: message.content
+          content: message.content,
+          seen: message.seen,
         };
         
         this.sharedObj.next(receivedMessageObject);
       });
-    } else {
+    }
+    
+    else
+    {
       console.warn('SignalR connection is not established yet.');
     }
   }
 
-   EditMessage(editMessage: any): void {
-  if (this.hubConnection.state === signalR.HubConnectionState.Connected) {
-    this.hubConnection.invoke('SendEditedMessage', editMessage)
+  EditMessage(editMessage: any): void
+  {
+     
+    if (this.hubConnection.state === signalR.HubConnectionState.Connected)
+    {
+      this.hubConnection.invoke('SendEditedMessage', editMessage)
       .then(() => {
         console.log('Edited message sent successfully');
       })
       .catch((error) => {
         console.error('Error sending edited message:', error);
       });
-  } else {
-    console.warn('SignalR connection is not established yet.');
+    }
+    
+    else
+    {
+        console.warn('SignalR connection is not established yet.');
+    }
   }
-}
 
-   onReceiveEditedMessage(): void {
+  onReceiveEditedMessage(): void
+  {
      
      this.connectionPromise;
-    if (this.isConnectionEstablished) {
-      this.hubConnection.on('ReceiveEdited', (editMessage: any) => {
+    if (this.isConnectionEstablished)
+    {
+      this.hubConnection.on('ReceiveEdited', (editMessage: any) =>
+      {
         console.log('Received Edited Message:', editMessage);
         
         const receivedEditedMessage: EditMessageDto = {
@@ -137,13 +188,18 @@ export class SignalrService {
         };
         this.sharedEditedObj.next(receivedEditedMessage);
       });
-    } else {
+    }
+    
+    else
+    {
       console.warn('SignalR connection is not established yet.');
     }
   }
 
-   deleteMessage(messageId: number): void {
-    if (this.hubConnection.state === signalR.HubConnectionState.Connected) {
+  deleteMessage(messageId: number): void
+  {
+    if (this.hubConnection.state === signalR.HubConnectionState.Connected)
+    {
       this.hubConnection.invoke('SendDeletedMessage', messageId)
         .then(() => {
           console.log('Deleted message sent successfully');
@@ -151,48 +207,56 @@ export class SignalrService {
         .catch((error) => {
           console.error('Error sending deleted message:', error);
         });
-    } else {
+    }
+    
+    else
+    {
       console.warn('SignalR connection is not established yet.');
     }
   }
   
-
-
-
-  
-  onReceiveDeletedMessage(): void {
-    if (this.isConnectionEstablished) {
-      this.hubConnection.on('ReceiveDeleted', (deletedMessageId: any) => {
-        // Handle received deleted messages here
-        // ...
-
+  onReceiveDeletedMessage(): void
+  {
+    if (this.isConnectionEstablished)
+    {
+      this.hubConnection.on('ReceiveDeleted', (deletedMessageId: any) =>
+      {
         // Notify subscribers
         this.sharedDeletedObj.next(deletedMessageId);
       });
-    } else {
+    }
+    
+    else
+    {
       console.warn('SignalR connection is not established yet.');
     }
   }
 
-  // Add this method to retrieve deleted messages
-  public retrieveDeletedObject(): Subject<Message> {
+ 
+  public retrieveDeletedObject(): Subject<Message>
+  {
     return this.sharedDeletedObj;
   }
 
-
-
-
-  public retrieveMappedObject(): Subject<MessageDto> {
+  public retrieveMappedObject(): Subject<MessageDto>
+  {
     return this.sharedObj;
   }
 
-   public retrieveEditedObject(): Subject<EditMessageDto> {
+  public retrieveEditedObject(): Subject<EditMessageDto>
+  {
     return this.sharedEditedObj;
   }
 
-  //  public retrieveDeletedObject(): Subject<Message> {
-  // return this.sharedDeletedObj;
+    public markMessageAsSeen(messageId: string) {
+    this.hubConnection.invoke('markMessageAsSeen', messageId);
+  }
+
+  public getMessageSeenObservable(): Observable<string> {
+    return this.messageSeenSubject.asObservable();
+  }
+
 }
-// }
+
 
 

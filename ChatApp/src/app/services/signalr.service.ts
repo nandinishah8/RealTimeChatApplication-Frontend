@@ -18,7 +18,12 @@ export class SignalrService {
   private sharedObj = new Subject<MessageDto>();
   private sharedEditedObj = new Subject<EditMessageDto>();
   private sharedDeletedObj = new Subject<Message>();
-   private messageSeenSubject: Subject<string> = new Subject<string>();
+  private messageSeenSubject: Subject<string> = new Subject<string>();
+  private unreadMessageCountSubject = new Subject<number>();
+  // public unreadMessageCount$ = this.unreadMessageCountSubject.asObservable();
+  public unreadMessageCount$: Observable<number> = this.unreadMessageCountSubject.asObservable();
+  private unreadMessageCount: number = 0;
+
  
  
   
@@ -28,24 +33,39 @@ export class SignalrService {
       .withUrl('http://localhost:5243/chatHub') 
       .withAutomaticReconnect()
       .build();
+    
+     this.unreadMessageCount = 0;
 
     
-    this.hubConnection.on("ReceiveOne", (message: any, senderId: any) => {
+     this.hubConnection.on("ReceiveOne", (message: any, senderId: any) => {
+      // Handle received messages
       const receivedMessageObject: MessageDto = {
         id: message.id,
         senderId: senderId,
         receiverId: message.receiverId,
         content: message.content,
         seen: message.seen,
-
       };
-      this.sharedObj.next(receivedMessageObject);
-    });
 
+       if (!receivedMessageObject.seen) {
+        this.unreadMessageCount++;
+        this.unreadMessageCountSubject.next(this.unreadMessageCount);
+      }
+
+      this.sharedObj.next(receivedMessageObject);
+     });
+    
+    
+    
      this.hubConnection.on('messageSeen', (messageId: string) => {
       this.messageSeenSubject.next(messageId);
     });
   
+     this.hubConnection.on("UpdateUnreadCount", (count: number) => {
+        // Update the count and notify subscribers.
+       this.unreadMessageCountSubject.next(count);
+       console.log(count);
+    });
 
    
   

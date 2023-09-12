@@ -46,15 +46,16 @@ export class ConversationComponent implements OnInit {
   }
 
   ngOnInit(): void {
+   
     this.route.params.subscribe((params) => {
       const userId = params['userId'];
       this.currentReceiverId = userId;
 
       console.log('currentReceiverId:', this.currentReceiverId);
 
+      this.unreadMessageCount = 1;
 
-
-      this.getMessages(
+      this.getMessages( 
         this.currentReceiverId,
         this.selectedSort,
         this.selectedOrder,
@@ -66,31 +67,14 @@ export class ConversationComponent implements OnInit {
     });
 
 
-    // this.signalrService.retrieveMappedObject().subscribe((receivedMessage: MessageDto) => {
-    //   console.log('Received message:', receivedMessage);
-    //   // Check if the received message is for the current user
-    //   if (receivedMessage.receiverId === this.currentUserId) {
-    //     receivedMessage.seen = true;
-    //     this.chatService.markMessageAsSeen(this.currentUserId, this.currentReceiverId, receivedMessage.id).subscribe(
-    //       (response) => {
-    //         // Handle success if needed
-    //       },
-    //       (error) => {
-    //         console.error('Error marking message as seen:', error);
-    //         // Handle the error if needed
-    //       }
-    //     );
-
-        
-    // }
-
     this.signalrService.retrieveMappedObject().subscribe((receivedMessage: MessageDto) => {
       console.log('Received message:', receivedMessage);
-
+      
       // Check if the received message is for the current user
-      if (receivedMessage.receiverId !== this.currentUserId) {
+      if (receivedMessage.receiverId !== this.currentUserId)
+      {
         if (!receivedMessage.seen) {
-          this.unreadMessageCount++; // Increment the unread message count
+          this.unreadMessageCount++; 
           console.log('Unread message count incremented to', this.unreadMessageCount);
         }
 
@@ -106,32 +90,32 @@ export class ConversationComponent implements OnInit {
         );
       };
 
-      this.signalrService.unreadMessageCount$.subscribe((count) => {
-        this.unreadMessageCount = count++;
-        this.changeDetector.detectChanges();
-        //console.log(this.unreadMessageCount);
+      this.signalrService.unreadMessageCount$.subscribe((count: any) => {
+        console.log(count);
         
-    });
-  
-
-         this.signalrService.retrieveEditedObject().subscribe((receivedEditedMessage: EditMessageDto) => {
+        // Update the unreadMessageCount in real-time
+        this.unreadMessageCount = count;
+        console.log(this.unreadMessageCount);
+        this.changeDetector.detectChanges();
+      });
+      
+    this.signalrService.retrieveEditedObject().subscribe((receivedEditedMessage: EditMessageDto) => {
         console.log('Received edited message:', receivedEditedMessage);
 
       });
 
 
       const existingMessage = this.messages.find(message => message.id === receivedMessage.id);
-
-      if (!existingMessage) {
+      if (!existingMessage)
+      {
         
         this.messages.push(receivedMessage);
-
-
         this.messages.sort((a, b) => b.timestamp - a.timestamp);
         this.changeDetector.detectChanges();
       }
     });
 
+    
     this.signalrService.getMessageSeenObservable().subscribe((messageId: string) => {
       const message = this.messages.find((msg) => msg.id === messageId);
       if (message) {
@@ -145,7 +129,6 @@ export class ConversationComponent implements OnInit {
 
 
       const editedMessageIndex = this.messages.findIndex((m) => m.id === receivedEditedMessage.id);
-
       if (editedMessageIndex !== -1) {
         this.messages[editedMessageIndex].content = receivedEditedMessage.content;
         this.changeDetector.detectChanges();
@@ -168,14 +151,14 @@ export class ConversationComponent implements OnInit {
   
 
   getMessages(
-    //conversationId: string,
     userId: string,
     sort: string,
     order: string,
     count: number,
     before: string,
     after: string
-  ) {
+  )
+  {
     // Modify your getMessages function to accept filter parameters and send them to the chatService
     this.chatService
       .getMessages(userId, sort, order, count, before, after)
@@ -207,7 +190,6 @@ export class ConversationComponent implements OnInit {
 
     this.chatService.searchMessages(this.searchQuery).subscribe((res) => {
       this.messages = res;
-
       console.log('Search results:', this.messages);
     });
   }
@@ -286,13 +268,7 @@ export class ConversationComponent implements OnInit {
   }
 
   onEditMessage(message: any) {
-    console.log(message);
-    console.log(message.senderId == this.currentReceiverId);
-    console.log(message.senderId);
-    console.log(this.currentReceiverId);
-
     if (message.senderId !== this.currentReceiverId) {
-      console.log("hiii");
       message.editMode = true;
       message.editedContent = message.content;
       message.showContextMenu = true;
@@ -330,21 +306,9 @@ export class ConversationComponent implements OnInit {
     }
   }
 
-  //  markMessageAsSeen(currentUserId: string, receiverId: string, messageId: string): void {
-  //     this.chatService
-  //       .markMessageAsSeen(currentUserId, receiverId, messageId)
-  //       .subscribe(
-  //         (response) => {
-  //           // Handle success if needed
-  //         },
-  //         (error) => {
-  //           console.error('Error marking message as seen:', error);
-  //           // Handle the error if needed
-  //         }
-  //       );
-  //   }
+ 
   
- markMessagesAsSeen(currentUserId: string, receiverId: string, messageId: string): void {
+  markMessagesAsSeen(currentUserId: string, receiverId: string, messageId: string): void {
   // Call the service method to mark messages as seen
   this.chatService
     .markMessageAsSeen(currentUserId, receiverId, messageId) 
@@ -355,12 +319,11 @@ export class ConversationComponent implements OnInit {
           this.unreadMessageCount--;
           console.log('Unread message count decremented to', this.unreadMessageCount);
         }
-        
       },
       (error) => {
         console.error('Error marking message as seen:', error);
-       
+        // Handle the error if needed
       }
-    );
-}
+   );
+  }
 }

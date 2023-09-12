@@ -11,6 +11,7 @@ export class ChatService {
   url = 'http://localhost:5243/api/Messages';
 
   sendMessage(receiverId: string, content: string): Observable<any> {
+    debugger
     const headers = new HttpHeaders({
       'Content-Type': 'application/json',
       Authorization: `Bearer ${this.user.getToken()}`,
@@ -20,7 +21,7 @@ export class ChatService {
       "content": content,
     };
    
-    return this.http.post<any>(this.url, body, { headers: headers });
+    return this.http.post<any>(`${this.url}`, body, { headers: headers });
   }
 
   
@@ -139,5 +140,10 @@ export class ChatService {
 
      // return this.http.post<any>(url, request);
      return this.http.post<any>(this.url,request);
+  }
+
+   getUnreadMessageCount(userId:any): Observable<number> {
+    // Replace this with your API endpoint to fetch the unread message count
+     return this.http.get<number>(`${this.url}/unread-counts/${userId}`);
   }
 }

@@ -27,30 +27,35 @@ export class ChatComponent implements OnInit {
 
   ngOnInit(): void {
 
-
-    console.log('Initializing component...');
-
-    
-      
     this.userService.retrieveUsers().subscribe(
       (res) => {
-        console.log('Received users:', res);
-        console.log('Is res an array?', Array.isArray(res));
+        
 
-        this.users = res; 
-        console.log('this.users:', this.users);
-
+        this.users = res;
         if (Array.isArray(this.users)) {
-          console.log('this.users is an array:', this.users);
-
-          this.currentReceiver = this.users[0];
+         
+        this.currentReceiver = this.users[0];
 
           this.users.forEach((user) => {
-            console.log('User name:', user.name);
-            console.log('User email:', user.email);
+             const userId = user.id;
 
-           
-        });
+            this.ChatService.getUnreadMessageCount(userId).subscribe(
+              (count:any) => {
+                console.log(count);
+                
+                this.unreadMessageCount = count.unreadCount;
+                console.log('Unread message count:', count);
+          },
+          (error) => {
+            console.error('Error fetching unread message count:', error);
+          }
+        );
+      },
+      (error: any) => {
+        console.error('Error fetching users:', error);
+      }
+    );
+        
       } else {
         console.error('this.users is not an array.');
       }

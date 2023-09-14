@@ -49,6 +49,7 @@ export class SignalrService {
       if (!receivedMessageObject.seen) {
         this.unreadMessageCount++;
         this.unreadMessageCountSubject.next(this.unreadMessageCount);
+        console.log(this.unreadMessageCount);
       }
 
       this.sharedObj.next(receivedMessageObject);
@@ -147,12 +148,24 @@ export class SignalrService {
   }
 
   markAllMessagesAsRead(receiverId: string): void {
-    if (this.hubConnection.state === signalR.HubConnectionState.Connected) {
-      this.hubConnection
-        .invoke('MarkAllMessagesAsRead', receiverId)
-        .catch((error) => console.error('Error invoking MarkAllMessagesAsRead:', error));
-    }
+  if (this.hubConnection.state === signalR.HubConnectionState.Connected) {
+    this.hubConnection
+      .invoke('MarkAllMessagesAsRead', receiverId)
+      .then((response: any) => {
+        console.log('Response from MarkAllMessagesAsRead:', response);
+        // Handle the response here (e.g., show a success message)
+        if (response === "All messages marked as read.") {
+          // Success, you can handle it accordingly
+        } else {
+          // Handle other responses or errors here
+        }
+      })
+      .catch((error) => {
+        console.error('Error invoking MarkAllMessagesAsRead:', error);
+        // Handle the error if needed
+      });
   }
+}
 
    updateMessagesMarkedAsRead(receiverId: any): void {
         this.allMessagesReadSubject.next(receiverId);

@@ -100,6 +100,23 @@ export class ConversationComponent implements OnInit {
         );
       };
 
+        // Fetch the read and unread message counts for the current user
+      this.chatService.getUnreadMessageCounts(this.currentUserId).subscribe(
+        (counts) => {
+          // Handle the response with counts here
+          console.log('Read and unread message counts:', counts);
+
+          // You can update your component properties with the counts if needed
+        
+          this.unreadMessageCount = counts.unreadCount;
+        },
+        (error) => {
+          console.error('Error fetching message counts:', error);
+          // Handle the error if needed
+        }
+      );
+
+
       this.signalrService.unreadMessageCount$.subscribe((count: any) => {
         console.log(count);
         
@@ -129,8 +146,10 @@ export class ConversationComponent implements OnInit {
     this.signalrService.getMessageSeenObservable().subscribe((messageId: string) => {
       const message = this.messages.find((msg) => msg.id === messageId);
       if (message) {
-        message.seen = true;
+        message.seen = false;
       }
+     
+      
     });
 
 

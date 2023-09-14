@@ -44,7 +44,7 @@ export class ChatComponent implements OnInit {
           this.users.forEach((user) => {
             const userId = user.id;
 
-            this.ChatService.getUnreadMessageCount(userId).subscribe(
+            this.ChatService.getUnreadMessageCounts(this.currentUserId).subscribe(
               (count: any) => {
                 console.log(count);
                 

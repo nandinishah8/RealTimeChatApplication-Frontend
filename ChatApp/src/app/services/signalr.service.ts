@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import * as signalR from '@microsoft/signalr';
 import { HubConnection, HubConnectionBuilder } from '@microsoft/signalr';
 import { MessageDto } from 'Dto/MessageDto';
-import { Subject, Observable } from 'rxjs';
+import { Subject, Observable, BehaviorSubject } from 'rxjs';
 import { EditMessageDto } from 'Dto/EditMessageDto';
 import { Message } from 'Dto/Message';
 
@@ -23,6 +23,8 @@ export class SignalrService {
   // public unreadMessageCount$ = this.unreadMessageCountSubject.asObservable();
  public unreadMessageCount$: Observable<number> = this.unreadMessageCountSubject.asObservable();
   private unreadMessageCount: number = 0;
+   private allMessagesReadSubject = new BehaviorSubject<string>('');
+  allMessagesRead$ = this.allMessagesReadSubject.asObservable();
 
  
  
@@ -53,8 +55,8 @@ export class SignalrService {
       this.sharedObj.next(receivedMessageObject);
     });
 
-    this.hubConnection.on('messageSeen', (messageId: string) => {
-      this.messageSeenSubject.next(messageId);
+    this.hubConnection.on('AllMessagesRead', (receiverId: string) => {
+      this.messageSeenSubject.next(receiverId);
     });
 
     this.hubConnection.on('UpdateUnreadCount', (count: number) => {
@@ -76,6 +78,7 @@ export class SignalrService {
     });
 
     this.startConnection();
+    this.registerAllMessagesReadHandler();
   }
 
    async startConnection(): Promise<void> {
@@ -90,6 +93,13 @@ export class SignalrService {
       throw error;
     }
   }
+
+  registerAllMessagesReadHandler = () => {
+    this.hubConnection.on('AllMessagesRead', (receiverId: string) => {
+      // Notify components that all messages are marked as read
+      this.allMessagesReadSubject.next(receiverId);
+    });
+  };
 
   sendMessage(message: any, senderId: any): void {
     if (this.hubConnection.state === signalR.HubConnectionState.Connected) {
@@ -136,8 +146,11 @@ export class SignalrService {
     }
   }
 
+    markAllMessagesAsRead(receiverId: string): void {
+        this.hubConnection.invoke('MarkAllMessagesAsRead', receiverId)
+            .catch((error) => console.error('Error invoking MarkAllMessagesAsRead:', error));
+    }
 
- 
   public retrieveDeletedObject(): Subject<Message> {
     return this.sharedDeletedObj;
   }
@@ -150,9 +163,9 @@ export class SignalrService {
     return this.sharedEditedObj;
   }
 
-  public markMessageAsSeen(messageId: string) {
-    this.hubConnection.invoke('markMessageAsSeen', messageId);
-  }
+  // public markMessageAsSeen(messageId: string) {
+  //   this.hubConnection.invoke('markMessageAsSeen', messageId);
+  // }
 
   public getMessageSeenObservable(): Observable<string> {
     return this.messageSeenSubject.asObservable();

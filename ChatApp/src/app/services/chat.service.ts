@@ -65,8 +65,8 @@ export class ChatService {
         console.log('getMessages response:', response);
         // Mark incoming messages as seen
         const messages = response.messages.map((message: any) => {
-          if (message.receiverId === userId && !message.seen) {
-            this.markMessageAsSeen(userId,userId,message.id).subscribe(
+          if (message.receiverId !== userId && !message.seen) {
+            this.markAllMessagesAsRead(message.receiverId).subscribe(
               () => {
                 message.seen = true;
               },
@@ -82,7 +82,8 @@ export class ChatService {
     );
   }
 
-   searchMessages(query: string): Observable<any[]> {
+  searchMessages(query: string): Observable<any[]>
+  {
     const headers = new HttpHeaders({
       'Content-Type': 'application/json',
       Authorization: `Bearer ${this.user.getToken()}`,
@@ -96,7 +97,8 @@ export class ChatService {
     });
   }
 
-  editMessage(messageId: number, content: string): Observable<any> {
+  editMessage(messageId: number, content: string): Observable<any>
+  {
     const headers = new HttpHeaders({
       'Content-Type': 'application/json',
       Authorization: `Bearer ${this.user.getToken()}`,
@@ -113,7 +115,8 @@ export class ChatService {
   }
 
   // Method to delete a message
-  deleteMessage(messageId: number): Observable<any> {
+  deleteMessage(messageId: number): Observable<any>
+  {
     const headers = new HttpHeaders({
       'Content-Type': 'application/json',
       Authorization: `Bearer ${this.user.getToken()}`,
@@ -124,25 +127,36 @@ export class ChatService {
     });
   }
 
-   markMessageAsSeen(currentUserId: string, receiverId: string, messageId: string): Observable<any> {
-     // const url = `${this.url}/mark-seen`;
-      const headers = new HttpHeaders({
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${this.user.getToken()}`,
-    });
+  // markMessageAsSeen(currentUserId: string, receiverId: string, messageId: string): Observable<any>
+  // {
+  //    // const url = `${this.url}/mark-seen`;
+  //     const headers = new HttpHeaders({
+  //     'Content-Type': 'application/json',
+  //     Authorization: `Bearer ${this.user.getToken()}`,
+  //   });
 
-    // Create a request body with the required data
-    const request = {
-      CurrentUserId: currentUserId,
-      ReceiverId: receiverId,
-      MessageId: messageId,
-    };
+  //   // Create a request body with the required data
+  //   const request = {
+  //     CurrentUserId: currentUserId,
+  //     ReceiverId: receiverId,
+  //     MessageId: messageId,
+  //   };
 
-     // return this.http.post<any>(url, request);
-     return this.http.post<any>(this.url,request);
+  //    // return this.http.post<any>(url, request);
+  //    return this.http.post<any>(this.url,request);
+  // }
+
+  markAllMessagesAsRead(receiverId: string): Observable<any> {
+  const headers = new HttpHeaders({
+    'Content-Type': 'application/json',
+    Authorization: `Bearer ${this.user.getToken()}`,
+  });
+
+  return this.http.post<any>(`${this.url}/mark-all-as-read/${receiverId}`, null, { headers: headers });
   }
-
-   getUnreadMessageCount(userId:any): Observable<number> {
+  
+  getUnreadMessageCount(userId: any): Observable<number>
+  {
     // Replace this with your API endpoint to fetch the unread message count
      return this.http.get<number>(`${this.url}/unread-counts/${userId}`);
   }

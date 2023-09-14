@@ -24,6 +24,7 @@ export class ChatComponent implements OnInit {
   currentReceiver: any;
   unreadMessageCount: number = 0;
   currentUserId!: string;
+  changeDetector: any;
   
   
 
@@ -71,7 +72,8 @@ export class ChatComponent implements OnInit {
 
      this.SignalrService.allMessagesRead$.subscribe((receiverId) => {
       if (receiverId) {
-        // Handle the event here, e.g., update your UI
+        
+        // this.changeDetector.detectChanges();
         console.log(`All messages are marked as read for receiver with ID: ${receiverId}`);
       }
     });
@@ -95,7 +97,7 @@ export class ChatComponent implements OnInit {
       if (user.messages) {
         user.messages.forEach((message: any) => {
           if (!message.seen) {
-            // Mark the message as seen
+          
             message.seen = true;
 
             // Decrease the unread message count for the user
@@ -106,11 +108,11 @@ export class ChatComponent implements OnInit {
               .markAllMessagesAsRead(this.currentReceiver)
               .subscribe(
                 () => {
-                  // Handle the success response if needed
+                 
                 },
                 (error) => {
                   console.error('Error marking message as seen:', error);
-                  // Handle the error if needed
+                  
                 }
               );
           }

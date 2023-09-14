@@ -53,7 +53,7 @@ export class ConversationComponent implements OnInit {
 
       console.log('currentReceiverId:', this.currentReceiverId);
 
-      this.unreadMessageCount = 1;
+      this.unreadMessageCount = 0;
 
       this.getMessages( 
         this.currentReceiverId,
@@ -67,30 +67,35 @@ export class ConversationComponent implements OnInit {
     });
 
       this.signalrService.allMessagesRead$.subscribe(() => {
-            // Handle the event here, e.g., update your UI
-            console.log('All messages are marked as read.');
-            // You can update your UI or perform other actions as needed
+       
+        console.log('All messages are marked as read.');
+
+        this.unreadMessageCount = 0;
+        this.changeDetector.detectChanges();
+
+       
+           
         });
 
     this.signalrService.retrieveMappedObject().subscribe((receivedMessage: MessageDto) => {
       console.log('Received message:', receivedMessage);
       
       // Check if the received message is for the current user
-      if (receivedMessage.receiverId === this.currentUserId)
+      if (receivedMessage.receiverId !== this.currentUserId)
       {
         if (!receivedMessage.seen) {
           this.unreadMessageCount++; 
           console.log('Unread message count incremented to', this.unreadMessageCount);
         }
 
-        receivedMessage.seen = true;
+        receivedMessage.seen = false;
         this.chatService.markAllMessagesAsRead(this.currentReceiverId).subscribe(
           (response) => {
-            // Handle success if needed
+           
           },
           (error) => {
             console.error('Error marking message as seen:', error);
-            // Handle the error if needed
+            
           }
         );
       };
@@ -124,7 +129,7 @@ export class ConversationComponent implements OnInit {
     this.signalrService.getMessageSeenObservable().subscribe((messageId: string) => {
       const message = this.messages.find((msg) => msg.id === messageId);
       if (message) {
-        message.seen = false;
+        message.seen = true;
       }
     });
 
@@ -261,7 +266,7 @@ export class ConversationComponent implements OnInit {
       },
       (error) => {
         console.error('Error editing message:', error);
-        // Handle the error if needed
+        
       }
     );
   }
@@ -311,41 +316,10 @@ export class ConversationComponent implements OnInit {
     }
   }
 
- 
-  
-  // markMessagesAsSeen(currentUserId: string, receiverId: string, messageId: string): void {
-  // // Call the service method to mark messages as seen
-  // this.chatService
-  //   .markMessageAsSeen(currentUserId, receiverId, messageId) 
-  //   .subscribe(
-  //     () => {
-  //       // Decrement the unread message count when a message is marked as seen
-  //       if (this.unreadMessageCount > 0) {
-  //         this.unreadMessageCount--;
-  //         console.log('Unread message count decremented to', this.unreadMessageCount);
-  //       }
-  //     },
-  //     (error) => {
-  //       console.error('Error marking message as seen:', error);
-  //       // Handle the error if needed
-  //     }
-  //  );
-  // }
-//   markAllMessagesAsRead(receiverId: string): void {
-//   this.chatService.markAllMessagesAsRead(receiverId).subscribe(
-//     () => {
-//       console.log('All messages marked as read.');
-//       // You can add any additional logic here after marking messages as read
-//     },
-//     (error) => {
-//       console.error('Error marking messages as read:', error);
-//       // Handle the error if needed
-//     }
-//   );
-// }
-
   markAllMessagesAsRead(receiverId: string): void {
         // Call the SignalR hub method to mark all messages as read
         this.signalrService.markAllMessagesAsRead(receiverId);
-    }
+  }
+  
+  
 }

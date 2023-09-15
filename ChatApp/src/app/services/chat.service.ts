@@ -133,12 +133,14 @@ export class ChatService {
     return this.http.post<any>(`${this.url}/mark-all-as-read/${receiverId}`,  { headers: headers });
   }
   
-  getUnreadMessageCounts(userId: string): Observable<any> {
-    const headers = new HttpHeaders({
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${this.user.getToken()}`,
-    });
+  
 
-    return this.http.get<any>(`${this.url}/unread-counts/${userId}`, { headers: headers });
-  }
+  getUnreadMessageCount(userId: any): Observable<any> {
+  const headers = new HttpHeaders({
+    'Content-Type': 'application/json',
+    Authorization: `Bearer ${this.user.getToken()}`,
+  });
+
+  return this.http.get<any>(`${this.url}/unread-counts/${userId}`, { headers: headers });
+}
 }

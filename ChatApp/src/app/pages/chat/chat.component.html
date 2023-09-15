@@ -11,6 +11,7 @@
                             <span class="app-name">Minimal Chat</span>
                         </a>
                         <div class="column-border"></div>
+
                         <ul class="list-unstyled chat-list mt-2 mb-0">
 
                             <li *ngFor="let user of users" class="clearfix" (click)="showMessage(user.id)">
@@ -23,7 +24,7 @@
                                 <div class="about">
                                     <div class="name">{{ user.name }}</div>
                                     <div class="email">{{ user.email }}</div>
-                                    <div>{{ user.unreadMessageCount }} unread messages</div>
+                                    <div>{{ unreadMessageCount }} unread messages</div>
 
 
                                 </div>

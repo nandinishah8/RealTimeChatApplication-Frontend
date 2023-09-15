@@ -7,7 +7,7 @@ import { RegisterComponent } from './pages/register/register.component';
 import { LoginComponent } from './pages/login/login.component';
 import { HttpClientModule } from '@angular/common/http';
 import { ChatComponent } from './pages/chat/chat.component';
-import { ConversationComponent } from './pages/conversation/ConversationComponent';
+import { ConversationComponent } from './pages/conversation/Conversation.component';
 import { RequestLogsComponent } from './pages/request-logs/request-logs.component';
 import { SignalrService } from './services/signalr.service';
 import {

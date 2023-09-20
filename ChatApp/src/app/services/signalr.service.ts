@@ -20,10 +20,11 @@ export class SignalrService {
   private sharedDeletedObj = new Subject<Message>();
   private messageSeenSubject: Subject<string> = new Subject<string>();
   private unreadMessageCountSubject: Subject<number> = new Subject<number>();
-  public unreadMessageCount$: Observable<number> = this.unreadMessageCountSubject.asObservable();
+  public unreadMessageCount$: Observable<any> = this.unreadMessageCountSubject.asObservable();
   private unreadMessageCount: number = 0;
   private allMessagesReadSubject = new BehaviorSubject<string>('');
   allMessagesRead$ = this.allMessagesReadSubject.asObservable();
+  private unreadMessageCounts: Map<string, number> = new Map<string, number>();
 
  
  
@@ -148,24 +149,32 @@ export class SignalrService {
   }
 
   markAllMessagesAsRead(receiverId: string): void {
-  if (this.hubConnection.state === signalR.HubConnectionState.Connected) {
-    this.hubConnection
-      .invoke('MarkAllMessagesAsRead', receiverId)
-      .then((response: any) => {
-        console.log('Response from MarkAllMessagesAsRead:', response);
-        // Handle the response here (e.g., show a success message)
-        if (response === "All messages marked as read.") {
-          // Success, you can handle it accordingly
-        } else {
-          // Handle other responses or errors here
-        }
-      })
-      .catch((error) => {
-        console.error('Error invoking MarkAllMessagesAsRead:', error);
-        // Handle the error if needed
-      });
+    if (this.hubConnection.state === signalR.HubConnectionState.Connected) {
+      this.hubConnection
+        .invoke('MarkAllMessagesAsRead', receiverId)
+        .then((response: any) => {
+          console.log('Response from MarkAllMessagesAsRead:', response);
+       
+          if (response === "All messages marked as read.") {
+         
+          } else {
+          
+          }
+        })
+        .catch((error) => {
+          console.error('Error invoking MarkAllMessagesAsRead:', error);
+      
+        });
+    }
   }
-}
+   
+  updateUnreadMessageCount(userId: string, increment: boolean): void {
+    let count = this.unreadMessageCounts.get(userId) || 0;
+    count = increment ? count + 1 : Math.max(count - 1, 0);
+    this.unreadMessageCounts.set(userId, count);
+    this.unreadMessageCountSubject.next(count);
+  }
+
 
    updateMessagesMarkedAsRead(receiverId: any): void {
         this.allMessagesReadSubject.next(receiverId);

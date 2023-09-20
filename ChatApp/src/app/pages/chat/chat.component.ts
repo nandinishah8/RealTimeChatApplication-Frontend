@@ -25,39 +25,52 @@ export class ChatComponent implements OnInit {
   unreadMessageCount: number = 0;
   currentUserId!: string;
   changeDetector: any;
+  userUnreadMessageCounts: Map<string, number> = new Map<string, number>();
+
   
   
 
   constructor(private userService: UserService, private router: Router, private ChatService: ChatService, private SignalrService: SignalrService) { }
 
   ngOnInit(): void {
+    // Fetch the list of users
     this.userService.retrieveUsers().subscribe(
       (res) => {
-        this.users = res;
-        if (Array.isArray(this.users)) {
-          this.currentReceiver = this.users[0];
+        // Store the users with their userIds
+        this.users = res.map((user) => ({
+          ...user,
+          userId: user.id, // Assuming 'id' is the userId property
+          unreadMessageCount: 0, // Initialize unreadMessageCount
+        }));
 
-          this.users.forEach((user) => {
-            const userId = user.id;
-
-            this.ChatService.getUnreadMessageCount(userId).subscribe(
-              (count: any) => {
-                user.unreadMessageCount = count.unreadCount;
-                console.log('Unread message count for user', user.name, ':', count.unreadCount);
-              },
-              (error) => {
-                console.error('Error fetching unread message count:', error);
-              }
-            );
-          });
-        } else {
-          console.error('this.users is not an array.');
-        }
+        // Subscribe to updates for each user's unread message count
+        this.users.forEach((user) => {
+          this.subscribeToUnreadMessageCount(user.userId);
+        });
       },
       (error) => {
         console.error('Error fetching users:', error);
       }
     );
+  }
+
+ subscribeToUnreadMessageCount(userId: string): void {
+  // Subscribe to changes in unread message count for the user
+  this.ChatService.getUnreadMessageCount(userId).subscribe(
+    (count: any) => {
+      // Update the user's unreadMessageCount property
+      const user = this.users.find((u) => u.userId === userId);
+      if (user) {
+        user.unreadMessageCount = count;
+        this.userUnreadMessageCounts.set(userId, count); // Store user-specific unread count
+      }
+    },
+    (error) => {
+      console.error('Error fetching unread message count:', error);
+    }
+  );
+  
+  
 
     this.SignalrService.allMessagesRead$.subscribe((receiverId) => {
       if (receiverId) {
@@ -66,12 +79,12 @@ export class ChatComponent implements OnInit {
     });
 
      this.SignalrService.unreadMessageCount$.subscribe((count: any) => {
-        console.log(count);
+       // console.log(count);
         
         // Update the unreadMessageCount in real-time
         this.unreadMessageCount = count;
-        console.log(this.unreadMessageCount);
-        // this.changeDetector.detectChanges();
+       console.log(count, "hfdushf");
+      
       });
       
   }
@@ -83,33 +96,35 @@ export class ChatComponent implements OnInit {
     this.currentReceiver = user;
   }
 
-  showMessage(id: string) {
-    this.router.navigate(['/chat', { outlets: { childPopup: ['user', id] } } ]);
+ showMessage(id: string) {
+  this.router.navigate(['/chat', { outlets: { childPopup: ['user', id] } }]);
 
-    const user = this.users.find((u) => u.id === id);
+  const user = this.users.find((u) => u.id === id);
 
-    if (user) {
-      if (user.messages) {
-        user.messages.forEach((message: any) => {
-          if (!message.seen) {
-            message.seen = true;
+  if (user) {
+    if (user.messages) {
+      user.messages.forEach((message: any) => {
+        if (!message.seen) {
+          message.seen = true;
 
-            user.unreadMessageCount = Math.max(user.unreadMessageCount - 1, 0);
-            console.log('Updated unread message count:', user.unreadMessageCount);
+          const userUnreadCount = this.userUnreadMessageCounts.get(id) || 0;
+          this.userUnreadMessageCounts.set(id, Math.max(userUnreadCount - 1, 0)); 
 
-            this.ChatService.markAllMessagesAsRead(this.currentReceiver).subscribe(
-              () => {
-                // Update the unread message count in the UI
-                user.unreadMessageCount = Math.max(user.unreadMessageCount - 1, 0);
-              },
-              (error) => {
-                console.error('Error marking message as seen:', error);
-              }
-            );
-          }
-        });
-      }
+          console.log(`Updated unread message count for user ${id}: ${userUnreadCount}`);
+          this.changeDetector.detectChanges();
+          this.ChatService.markAllMessagesAsRead(this.currentReceiver).subscribe(
+            () => {
+              // Update the unread message count in the UI
+              this.userUnreadMessageCounts.set(id, Math.max(userUnreadCount - 1, 0)); 
+            },
+            (error) => {
+              console.error('Error marking message as seen:', error);
+            }
+          );
+        }
+      });
     }
   }
+}
 }
  

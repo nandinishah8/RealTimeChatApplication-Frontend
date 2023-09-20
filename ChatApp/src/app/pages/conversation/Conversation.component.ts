@@ -86,6 +86,7 @@ export class ConversationComponent implements OnInit {
         if (!receivedMessage.seen) {
           this.unreadMessageCount++; 
           console.log('Unread message count incremented to', this.unreadMessageCount);
+          this.changeDetector.detectChanges();
         }
 
         receivedMessage.seen = false;
@@ -100,31 +101,7 @@ export class ConversationComponent implements OnInit {
         );
       };
 
-      //  //Fetch the read and unread message counts for the current user
-      // this.chatService.getUnreadMessageCount(this.currentUserId).subscribe(
-      //   (counts) => {
-      //     // Handle the response with counts here
-      //     console.log('Read and unread message counts:', counts);
-
-      //     // You can update your component properties with the counts if needed
-        
-      //     this.unreadMessageCount = counts.unreadCount;
-      //   },
-      //   (error) => {
-      //     console.error('Error fetching message counts:', error);
-      //     // Handle the error if needed
-      //   }
-      // );
-
-
-      this.signalrService.unreadMessageCount$.subscribe((count: any) => {
-        console.log(count);
-        
-        // Update the unreadMessageCount in real-time
-        this.unreadMessageCount = count;
-        console.log(this.unreadMessageCount);
-        this.changeDetector.detectChanges();
-      });
+    
       
     this.signalrService.retrieveEditedObject().subscribe((receivedEditedMessage: EditMessageDto) => {
         console.log('Received edited message:', receivedEditedMessage);

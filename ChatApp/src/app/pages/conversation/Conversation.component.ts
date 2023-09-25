@@ -32,6 +32,7 @@ export class ConversationComponent implements OnInit {
   searchQuery: string = '';
   unreadMessageCount: number = 0;
   messageId!: string;
+  private unreadMessageCounts: { [userId: string]: number } = {};
 
   constructor(
     private route: ActivatedRoute,
@@ -79,6 +80,7 @@ export class ConversationComponent implements OnInit {
 
     this.signalrService.retrieveMappedObject().subscribe((receivedMessage: MessageDto) => {
       console.log('Received message:', receivedMessage);
+      this.changeDetector.detectChanges();
       
       // Check if the received message is for the current user
       if (receivedMessage.receiverId !== this.currentUserId)
@@ -86,7 +88,8 @@ export class ConversationComponent implements OnInit {
         if (!receivedMessage.seen) {
           this.unreadMessageCount++; 
           console.log('Unread message count incremented to', this.unreadMessageCount);
-          this.changeDetector.detectChanges();
+            localStorage.setItem('count', this.unreadMessageCount.toString());
+
         }
 
         receivedMessage.seen = false;
@@ -172,6 +175,7 @@ export class ConversationComponent implements OnInit {
         this.messages = res;
 
         console.log('getMessages messages:', this.messages);
+ 
       });
   }
 
@@ -220,7 +224,7 @@ export class ConversationComponent implements OnInit {
             content: response.content,
           };
 
-
+         
           this.signalrService.sendMessage(message, response.senderId);
         },
         (error) => {

@@ -4,6 +4,7 @@ import { HubConnection, HubConnectionBuilder } from '@microsoft/signalr';
 import { MessageDto } from 'Dto/MessageDto';
 import { Subject, Observable, BehaviorSubject } from 'rxjs';
 import { EditMessageDto } from 'Dto/EditMessageDto';
+import { ChangeDetectorRef } from '@angular/core';
 import { Message } from 'Dto/Message';
 
 @Injectable({
@@ -24,8 +25,9 @@ export class SignalrService {
   private unreadMessageCount: number = 0;
   private allMessagesReadSubject = new BehaviorSubject<string>('');
   allMessagesRead$ = this.allMessagesReadSubject.asObservable();
-  private unreadMessageCounts: Map<string, number> = new Map<string, number>();
-
+ // private unreadMessageCounts: Map<string, number> = new Map<string, number>();
+  changeDetector: any;
+private unreadMessageCounts: { [userId: string]: number } = {};
  
  
   
@@ -38,18 +40,24 @@ export class SignalrService {
     
      this.unreadMessageCount = 0;
     
-      this.hubConnection.on('ReceiveOne', (message: any, senderId: any) => {
+      this.hubConnection.on('ReceiveOne', (message: any, senderId: any, unreadMessageCount: number) => {
       const receivedMessageObject: MessageDto = {
         id: message.id,
         senderId: senderId,
         receiverId: message.receiverId,
         content: message.content,
         seen: message.seen,
-      };
+        };
+        
+        //this.unreadMessageCount = unreadMessageCount;
+       // this.changeDetector.detectChanges();
+        
+        console.log(unreadMessageCount);
 
       if (!receivedMessageObject.seen) {
         this.unreadMessageCount++;
         this.unreadMessageCountSubject.next(this.unreadMessageCount);
+        //console.log(this.unreadMessageCount);
         console.log(this.unreadMessageCount);
       }
 
@@ -58,11 +66,14 @@ export class SignalrService {
 
     this.hubConnection.on('AllMessagesRead', (receiverId: string) => {
       this.messageSeenSubject.next(receiverId);
+       //this.unreadMessageCount = 0;
+       // this.changeDetector.detectChanges();
     });
 
-    this.hubConnection.on('UpdateUnreadCount', (count: number) => {
-      this.unreadMessageCount = count;
-      this.unreadMessageCountSubject.next(count);
+    this.hubConnection.on('UpdateUnreadCount', (userId: string, count: number) => {
+      // Update the unread message count for the user
+      this.unreadMessageCounts[userId] = count;
+      this.unreadMessageCountSubject.next(this.calculateTotalUnreadMessages()); // Update total unread count
     });
 
     this.hubConnection.on('ReceiveEdited', (editedMessage: any) => {
@@ -78,7 +89,7 @@ export class SignalrService {
       this.sharedDeletedObj.next(deletedMessage);
     });
 
-    this.registerAllMessagesReadHandler();
+    this.calculateTotalUnreadMessages();
     this.startConnection();
   }
 
@@ -95,13 +106,7 @@ export class SignalrService {
     }
   }
 
-  registerAllMessagesReadHandler = () => {
-    this.hubConnection.on('AllMessagesRead', (receiverId: string) => {
-      
-      this.allMessagesReadSubject.next(receiverId);
-      
-    });
-  };
+  
 
   sendMessage(message: any, senderId: any): void {
     if (this.hubConnection.state === signalR.HubConnectionState.Connected) {
@@ -167,13 +172,21 @@ export class SignalrService {
         });
     }
   }
-   
-  updateUnreadMessageCount(userId: string, increment: boolean): void {
-    let count = this.unreadMessageCounts.get(userId) || 0;
-    count = increment ? count + 1 : Math.max(count - 1, 0);
-    this.unreadMessageCounts.set(userId, count);
-    this.unreadMessageCountSubject.next(count);
+
+   calculateTotalUnreadMessages(): number {
+    let totalUnread = 0;
+    for (const userId in this.unreadMessageCounts) {
+      totalUnread += this.unreadMessageCounts[userId];
+    }
+    return totalUnread;
   }
+   
+  // updateUnreadMessageCount(userId: string, increment: boolean): void {
+  //   let count = this.unreadMessageCounts.get(userId) || 0;
+  //   count = increment ? count + 1 : Math.max(count - 1, 0);
+  //   this.unreadMessageCounts.set(userId, count);
+  //   this.unreadMessageCountSubject.next(count);
+  // }
 
 
    updateMessagesMarkedAsRead(receiverId: any): void {

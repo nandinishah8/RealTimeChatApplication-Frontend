@@ -24,9 +24,8 @@
                                 <div class="about">
                                     <div class="name">{{ user.name }}</div>
                                     <div class="email">{{ user.email }}</div>
-                                    <div>{{ unreadMessageCount }} unread messages</div>
-
-
+                                    <!-- <div>{{ userUnreadMessageCounts.get(user.userId) }} unread messages</div> -->
+                                    {{userUnreadMessageCounts}}
                                 </div>
                             </li>
                         </ul>

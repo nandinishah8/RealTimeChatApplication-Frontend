@@ -17,6 +17,7 @@ import {
 } from '@abacritt/angularx-social-login';
 import { GoogleLoginProvider } from '@abacritt/angularx-social-login';
 import { Subscription } from 'rxjs';
+import { ChannelListComponent } from './pages/channel-list/channel-list.component';
 
 @NgModule({
   declarations: [
@@ -26,6 +27,7 @@ import { Subscription } from 'rxjs';
     ChatComponent,
     ConversationComponent,
     RequestLogsComponent,
+    ChannelListComponent,
   ],
   imports: [
     BrowserModule,

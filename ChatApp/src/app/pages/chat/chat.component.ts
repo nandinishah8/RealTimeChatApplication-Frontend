@@ -46,7 +46,7 @@ export class ChatComponent implements OnInit {
         this.users = res.map((user) => ({
           ...user,
           userId: user.id,
-          //unreadMessageCount: 0,
+          
         }));
 
         // Subscribe to updates for each user's unread message count
@@ -62,12 +62,7 @@ export class ChatComponent implements OnInit {
     );
   }
 
-  //  ngOnDestroy(): void {
-  //   // Unsubscribe from the unread message count subscription
-  //   if (this.unreadMessageCountSubscription) {
-  //     this.unreadMessageCountSubscription.unsubscribe();
-  //   }
-  // }
+  
 
   subscribeToUnreadMessageCount(userId: string): void {
     // Subscribe to changes in unread message count for the user
@@ -107,41 +102,7 @@ export class ChatComponent implements OnInit {
     this.currentReceiver = user;
   }
 
-//   showMessage(id: string) {
-//     this.router.navigate(['/chat', { outlets: { childPopup: ['user', id] } }]);
 
-//     const user = this.users.find((u) => u.id === id);
-
-//     if (user) {
-//       if (user.messages) {
-//         user.messages.forEach((message: any) => {
-//           if (!message.seen) {
-//             message.seen = true;
-
-//             const userUnreadCount = this.userUnreadMessageCounts.get(id) || 0;
-//             this.userUnreadMessageCounts.set(id, Math.max(userUnreadCount - 1, 0));
-
-//             console.log(`Updated unread message count for user ${id}: ${userUnreadCount}`);
-//             this.changeDetector.detectChanges();
-//             this.ChatService.markAllMessagesAsRead(this.currentReceiver).subscribe(
-//               () => {
-//                 // Update the unread message count in the UI
-//                 user.unreadMessageCount = Math.max(userUnreadCount - 1, 0);
-
-//                 // Update the receiverUnreadCounts object for this receiver
-//                 this.receiverUnreadCounts[id] = user.unreadMessageCount;
-//               },
-//               (error) => {
-//                 console.error('Error marking message as seen:', error);
-//               }
-//             );
-//           }
-//         });
-//       }
-//     }
-    
-//   }
-// }
  showMessage(id: string) {
     this.router.navigate(['/chat', { outlets: { childPopup: ['user', id] } }]);
 

@@ -25,7 +25,7 @@ export class SignalrService {
   private unreadMessageCount: number = 0;
   private allMessagesReadSubject = new BehaviorSubject<string>('');
   allMessagesRead$ = this.allMessagesReadSubject.asObservable();
- // private unreadMessageCounts: Map<string, number> = new Map<string, number>();
+ 
   changeDetector: any;
 private unreadMessageCounts: { [userId: string]: number } = {};
  
@@ -48,16 +48,13 @@ private unreadMessageCounts: { [userId: string]: number } = {};
         content: message.content,
         seen: message.seen,
         };
-        
-        //this.unreadMessageCount = unreadMessageCount;
-       // this.changeDetector.detectChanges();
-        
+      
         console.log(unreadMessageCount);
 
       if (!receivedMessageObject.seen) {
         this.unreadMessageCount++;
         this.unreadMessageCountSubject.next(this.unreadMessageCount);
-        //console.log(this.unreadMessageCount);
+       
         console.log(this.unreadMessageCount);
       }
 
@@ -66,8 +63,7 @@ private unreadMessageCounts: { [userId: string]: number } = {};
 
     this.hubConnection.on('AllMessagesRead', (receiverId: string) => {
       this.messageSeenSubject.next(receiverId);
-       //this.unreadMessageCount = 0;
-       // this.changeDetector.detectChanges();
+       
     });
 
     this.hubConnection.on('UpdateUnreadCount', (userId: string, count: number) => {
@@ -181,13 +177,7 @@ private unreadMessageCounts: { [userId: string]: number } = {};
     return totalUnread;
   }
    
-  // updateUnreadMessageCount(userId: string, increment: boolean): void {
-  //   let count = this.unreadMessageCounts.get(userId) || 0;
-  //   count = increment ? count + 1 : Math.max(count - 1, 0);
-  //   this.unreadMessageCounts.set(userId, count);
-  //   this.unreadMessageCountSubject.next(count);
-  // }
-
+  
 
    updateMessagesMarkedAsRead(receiverId: any): void {
         this.allMessagesReadSubject.next(receiverId);

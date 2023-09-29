@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ChannelService } from 'src/app/services/channel.service';
+import { HttpClient } from '@angular/common/http';
+import { UserService } from '../../services/user.service';
 
 @Component({
   selector: 'app-channel-list',
@@ -7,23 +9,25 @@ import { ChannelService } from 'src/app/services/channel.service';
   styleUrls: ['./channel-list.component.css']
 })
 export class ChannelListComponent implements OnInit {
-  channels: any[] = [];
+  userChannels: any[] = [];
 
- constructor(private channelService: ChannelService) {}
+  constructor(private channelService: ChannelService, private http: HttpClient, private UserService: UserService) { }
+  url = 'http://localhost:5243/api/Channels';
 
+  // In your ChannelsComponent
   ngOnInit(): void {
-    // Fetch the list of channels when the component initializes
-    this.channelService.getChannels().subscribe(
-      (channels) => {
-        this.channels = channels;
+    const userId = '81946bd0-64d8-42cf-b743-f2fd7f6ebf39'; // Replace with the actual logged-in user's ID
+    // Fetch the user's channels from your backend API
+    this.http.get(`http://localhost:5243/api/Channels/UserId?userId=${userId}`).subscribe(
+      (response: any) => {
+        this.userChannels = response;
       },
       (error) => {
-        console.error('Error fetching channels:', error);
+        console.error('Error fetching user channels:', error);
       }
     );
   }
 }
-
 
 
 

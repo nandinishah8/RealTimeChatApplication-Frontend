@@ -28,10 +28,31 @@
                                     {{userUnreadMessageCounts}}
                                 </div>
                             </li>
+                            <div class="column-border"></div>
+                            <ul class="list-unstyled chat-list mt-2 mb-0">
+                                <li *ngFor="let channel of channels" class="clearfix"
+                                    (click)="onChannelClick(channel.channelId)">
+                                    <div class="profile">
+                                        <div class="user-image">
+                                            <span>{{ channel.name.charAt(0) }}</span>
+
+                                        </div>
+                                        <div class="about">
+                                            <div class="name">{{ channel.name }}</div>
+                                            <!-- <div class="description">{{ channel.description }}</div> -->
+                                        </div>
+                                    </div>
+                                </li>
+                            </ul>
                         </ul>
                     </div>
                 </div>
+
                 <router-outlet name="childPopup"></router-outlet>
+
+
             </div>
         </div>
     </div>
+
+</div>

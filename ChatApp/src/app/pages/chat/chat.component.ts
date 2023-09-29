@@ -5,6 +5,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { UserService } from 'src/app/services/user.service';
 import { ChatService } from '../../services/chat.service';
 import { SignalrService } from '../../services/signalr.service';
+import { ChannelService } from 'src/app/services/channel.service';
 import {
   FormGroup,
   FormBuilder,
@@ -30,24 +31,23 @@ export class ChatComponent implements OnInit {
   receiverUnreadCounts: { [receiverId: string]: number } = {};
   receivedMessage: any;
   unreadMessageCountSubscription!: Subscription;
+  channels: any[] = [];
   
 
   
   
 
-  constructor(private userService: UserService, private router: Router, private ChatService: ChatService, private SignalrService: SignalrService) { }
+  constructor(private userService: UserService, private router: Router, private ChatService: ChatService, private SignalrService: SignalrService, private ChannelService: ChannelService) { }
 
   ngOnInit(): void {
     // Fetch the list of users
    
+   
     this.userService.retrieveUsers().subscribe(
       (res) => {
-        // Store the users with their userIds
-        this.users = res.map((user) => ({
-          ...user,
-          userId: user.id,
-          //unreadMessageCount: 0,
-        }));
+        this.users = res.map((user) => ({ ...user, userId: user.id }));
+        this.loadChannels(); // Load channels after loading users
+      }),
 
         // Subscribe to updates for each user's unread message count
         this.users.forEach((user) => {
@@ -55,19 +55,26 @@ export class ChatComponent implements OnInit {
           this.showMessage(user.id);
           this.subscribeToUnreadMessageCount(user.userId);
         });
+      (error: any) => {
+        console.error('Error fetching users:', error);
+      }
+    ;
+  }
+
+  loadChannels() {
+    // Fetch the list of channels
+    const userId = this.currentUserId;
+    this.ChannelService.getChannels(userId).subscribe(
+      (res) => {
+        this.channels = res;
       },
       (error) => {
-        console.error('Error fetching users:', error);
+        console.error('Error fetching channels:', error);
       }
     );
   }
 
-  //  ngOnDestroy(): void {
-  //   // Unsubscribe from the unread message count subscription
-  //   if (this.unreadMessageCountSubscription) {
-  //     this.unreadMessageCountSubscription.unsubscribe();
-  //   }
-  // }
+ 
 
   subscribeToUnreadMessageCount(userId: string): void {
     // Subscribe to changes in unread message count for the user
@@ -107,41 +114,7 @@ export class ChatComponent implements OnInit {
     this.currentReceiver = user;
   }
 
-//   showMessage(id: string) {
-//     this.router.navigate(['/chat', { outlets: { childPopup: ['user', id] } }]);
 
-//     const user = this.users.find((u) => u.id === id);
-
-//     if (user) {
-//       if (user.messages) {
-//         user.messages.forEach((message: any) => {
-//           if (!message.seen) {
-//             message.seen = true;
-
-//             const userUnreadCount = this.userUnreadMessageCounts.get(id) || 0;
-//             this.userUnreadMessageCounts.set(id, Math.max(userUnreadCount - 1, 0));
-
-//             console.log(`Updated unread message count for user ${id}: ${userUnreadCount}`);
-//             this.changeDetector.detectChanges();
-//             this.ChatService.markAllMessagesAsRead(this.currentReceiver).subscribe(
-//               () => {
-//                 // Update the unread message count in the UI
-//                 user.unreadMessageCount = Math.max(userUnreadCount - 1, 0);
-
-//                 // Update the receiverUnreadCounts object for this receiver
-//                 this.receiverUnreadCounts[id] = user.unreadMessageCount;
-//               },
-//               (error) => {
-//                 console.error('Error marking message as seen:', error);
-//               }
-//             );
-//           }
-//         });
-//       }
-//     }
-    
-//   }
-// }
  showMessage(id: string) {
     this.router.navigate(['/chat', { outlets: { childPopup: ['user', id] } }]);
 
@@ -178,5 +151,10 @@ export class ChatComponent implements OnInit {
       }
     }
   }
+
+    onChannelClick(channel: any) {
+  // Handle channel click, e.g., navigate to chat window with the channel ID
+  this.router.navigate(['/chat',  { outlets: { childPopup: ['chat', channel] } }]);
+}
 }
  

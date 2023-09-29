@@ -1,8 +1,8 @@
-<div class="container">
-    <h2>Channel List</h2>
+<div>
+    <h2>Your Channels</h2>
     <ul>
-        <li *ngFor="let channel of channels">
-            <a [routerLink]="['/channels', channel.id]">{{ channel.name }}</a>
+        <li *ngFor="let channel of userChannels">
+            <a [routerLink]="['/chat', channel.channelId]">{{ channel.name }}</a>
         </li>
     </ul>
 </div>

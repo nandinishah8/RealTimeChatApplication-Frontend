@@ -22,8 +22,19 @@ const routes: Routes = [
     ],
   },
   { path: 'logs', component: RequestLogsComponent },
-  {
-    path: 'channelList' , component: ChannelListComponent}
+  { path: 'channelList', component: ChannelListComponent },
+  // { path: 'chat/:channelId', component: ChatComponent },
+    {
+    path: 'chat',
+    component: ChatComponent,
+    children: [
+      {
+        path: 'chat/:channelId',
+        component: ConversationComponent,
+        outlet: 'childPopup',
+      },
+    ],
+  },
 ];
 
 @NgModule({

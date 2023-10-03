@@ -25,9 +25,9 @@ export class SignalrService {
   private unreadMessageCount: number = 0;
   private allMessagesReadSubject = new BehaviorSubject<string>('');
   allMessagesRead$ = this.allMessagesReadSubject.asObservable();
- // private unreadMessageCounts: Map<string, number> = new Map<string, number>();
+ 
   changeDetector: any;
-private unreadMessageCounts: { [userId: string]: number } = {};
+  private unreadMessageCounts: { [userId: string]: number } = {};
  
  
   
@@ -38,7 +38,7 @@ private unreadMessageCounts: { [userId: string]: number } = {};
       .withAutomaticReconnect()
       .build();
     
-     this.unreadMessageCount = 0;
+     
     
       this.hubConnection.on('ReceiveOne', (message: any, senderId: any, unreadMessageCount: number) => {
       const receivedMessageObject: MessageDto = {
@@ -49,32 +49,21 @@ private unreadMessageCounts: { [userId: string]: number } = {};
         seen: message.seen,
         };
         
-        //this.unreadMessageCount = unreadMessageCount;
-       // this.changeDetector.detectChanges();
-        
         console.log(unreadMessageCount);
 
       if (!receivedMessageObject.seen) {
         this.unreadMessageCount++;
         this.unreadMessageCountSubject.next(this.unreadMessageCount);
-        //console.log(this.unreadMessageCount);
+       
         console.log(this.unreadMessageCount);
       }
 
       this.sharedObj.next(receivedMessageObject);
     });
 
-    this.hubConnection.on('AllMessagesRead', (receiverId: string) => {
-      this.messageSeenSubject.next(receiverId);
-       //this.unreadMessageCount = 0;
-       // this.changeDetector.detectChanges();
-    });
+   
 
-    this.hubConnection.on('UpdateUnreadCount', (userId: string, count: number) => {
-      // Update the unread message count for the user
-      this.unreadMessageCounts[userId] = count;
-      this.unreadMessageCountSubject.next(this.calculateTotalUnreadMessages()); // Update total unread count
-    });
+  
 
     this.hubConnection.on('ReceiveEdited', (editedMessage: any) => {
       const receivedEditedMessage: EditMessageDto = {
@@ -89,7 +78,7 @@ private unreadMessageCounts: { [userId: string]: number } = {};
       this.sharedDeletedObj.next(deletedMessage);
     });
 
-    this.calculateTotalUnreadMessages();
+   
     this.startConnection();
   }
 
@@ -173,26 +162,11 @@ private unreadMessageCounts: { [userId: string]: number } = {};
     }
   }
 
-   calculateTotalUnreadMessages(): number {
-    let totalUnread = 0;
-    for (const userId in this.unreadMessageCounts) {
-      totalUnread += this.unreadMessageCounts[userId];
-    }
-    return totalUnread;
-  }
    
-  // updateUnreadMessageCount(userId: string, increment: boolean): void {
-  //   let count = this.unreadMessageCounts.get(userId) || 0;
-  //   count = increment ? count + 1 : Math.max(count - 1, 0);
-  //   this.unreadMessageCounts.set(userId, count);
-  //   this.unreadMessageCountSubject.next(count);
-  // }
+   
+  
 
-
-   updateMessagesMarkedAsRead(receiverId: any): void {
-        this.allMessagesReadSubject.next(receiverId);
-    }
-
+   
   public retrieveDeletedObject(): Subject<Message> {
     return this.sharedDeletedObj;
   }
@@ -205,9 +179,7 @@ private unreadMessageCounts: { [userId: string]: number } = {};
     return this.sharedEditedObj;
   }
 
-  public getMessageSeenObservable(): Observable<string> {
-    return this.messageSeenSubject.asObservable();
-  }
+ 
 }
 
 

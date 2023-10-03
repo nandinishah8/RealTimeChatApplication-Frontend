@@ -1,5 +1,5 @@
 body {
-    background-color:whitesmoke;
+    background-color: whitesmoke;
     margin-top: 20px;
 }
 
@@ -25,11 +25,11 @@ body {
 
 .header {
     background: #0048AA;
-        border-radius: 2px 0 0 2px;
-        flex-basis: 275px;
-        margin-left: 0px;
-        height: 651px;
-        width: 260px
+    border-radius: 2px 0 0 2px;
+    flex-basis: 275px;
+    margin-left: 0px;
+    height: 651px;
+    width: 260px
 }
 
 .people-list {
@@ -128,7 +128,9 @@ body {
     width: 260px;
     border-top: 2px solid #ccc;
     margin: 14px 0;
+    margin-left: -10px;
 }
+
 
 
 

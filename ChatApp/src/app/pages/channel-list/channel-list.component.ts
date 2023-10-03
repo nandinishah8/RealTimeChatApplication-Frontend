@@ -10,6 +10,7 @@ import { UserService } from '../../services/user.service';
 })
 export class ChannelListComponent implements OnInit {
   userChannels: any[] = [];
+channel: any[] = [];
 
   constructor(private channelService: ChannelService, private http: HttpClient, private UserService: UserService) { }
   url = 'http://localhost:5243/api/Channels';

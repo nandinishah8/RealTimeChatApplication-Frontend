@@ -32,7 +32,7 @@ export class ConversationComponent implements OnInit {
   searchQuery: string = '';
   unreadMessageCount: number = 0;
   messageId!: string;
-  private unreadMessageCounts: { [userId: string]: number } = {};
+  
 
   constructor(
     private route: ActivatedRoute,
@@ -54,9 +54,9 @@ export class ConversationComponent implements OnInit {
 
       console.log('currentReceiverId:', this.currentReceiverId);
 
-      this.unreadMessageCount = 0;
+      
 
-      this.getMessages( 
+      this.getMessages(
         this.currentReceiverId,
         this.selectedSort,
         this.selectedOrder,
@@ -64,57 +64,25 @@ export class ConversationComponent implements OnInit {
         this.selectedBefore,
         this.selectedAfter
       )
-      this.markAllMessagesAsRead(this.currentReceiverId);
+      
     });
 
-      this.signalrService.allMessagesRead$.subscribe(() => {
-       
-        console.log('All messages are marked as read.');
-
-        this.unreadMessageCount = 0;
-        this.changeDetector.detectChanges();
-
-       
-           
-        });
 
     this.signalrService.retrieveMappedObject().subscribe((receivedMessage: MessageDto) => {
       console.log('Received message:', receivedMessage);
       this.changeDetector.detectChanges();
-      
-      // Check if the received message is for the current user
-      if (receivedMessage.receiverId !== this.currentUserId)
-      {
-        if (!receivedMessage.seen) {
-          this.unreadMessageCount++; 
-          console.log('Unread message count incremented to', this.unreadMessageCount);
-            localStorage.setItem('count', this.unreadMessageCount.toString());
 
-        }
-
-        receivedMessage.seen = false;
-        this.chatService.markAllMessagesAsRead(this.currentReceiverId).subscribe(
-          (response) => {
-           
-          },
-          (error) => {
-            console.error('Error marking message as seen:', error);
-            
-          }
-        );
-      };
 
     
       
-    this.signalrService.retrieveEditedObject().subscribe((receivedEditedMessage: EditMessageDto) => {
+      this.signalrService.retrieveEditedObject().subscribe((receivedEditedMessage: EditMessageDto) => {
         console.log('Received edited message:', receivedEditedMessage);
 
       });
 
 
       const existingMessage = this.messages.find(message => message.id === receivedMessage.id);
-      if (!existingMessage)
-      {
+      if (!existingMessage) {
         
         this.messages.push(receivedMessage);
         this.messages.sort((a, b) => b.timestamp - a.timestamp);
@@ -123,14 +91,7 @@ export class ConversationComponent implements OnInit {
     });
 
     
-    this.signalrService.getMessageSeenObservable().subscribe((messageId: string) => {
-      const message = this.messages.find((msg) => msg.id === messageId);
-      if (message) {
-        message.seen = false;
-      }
-     
-      
-    });
+   
 
 
     this.signalrService.retrieveEditedObject().subscribe((receivedEditedMessage: EditMessageDto) => {
@@ -166,9 +127,8 @@ export class ConversationComponent implements OnInit {
     count: number,
     before: string,
     after: string
-  )
-  {
-    // Modify your getMessages function to accept filter parameters and send them to the chatService
+  ) {
+   
     this.chatService
       .getMessages(userId, sort, order, count, before, after)
       .subscribe((res) => {
@@ -290,7 +250,7 @@ export class ConversationComponent implements OnInit {
       () => {
         const index = this.messages.findIndex((m) => m.id === message.id);
         if (index !== -1) {
-          this.messages.splice(index, 1); // Remove the message from the array
+          this.messages.splice(index, 1); 
         }
 
         // Send a delete request using SignalR
@@ -316,11 +276,8 @@ export class ConversationComponent implements OnInit {
     }
   }
 
-  markAllMessagesAsRead(receiverId: string): void {
-        // Call the SignalR hub method to mark all messages as read
-        this.signalrService.markAllMessagesAsRead(receiverId);
-  }
-  
-  
 }
+  
+  
+
 

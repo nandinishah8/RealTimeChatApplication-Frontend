@@ -6,6 +6,8 @@ import { UserService } from 'src/app/services/user.service';
 import { ChatService } from '../../services/chat.service';
 import { SignalrService } from '../../services/signalr.service';
 import { ChannelService } from 'src/app/services/channel.service';
+import jwt_decode from 'jwt-decode';
+
 import {
   FormGroup,
   FormBuilder,
@@ -24,36 +26,62 @@ import { Subscription } from 'rxjs';
 export class ChatComponent implements OnInit {
   users: any[] = [];
   currentReceiver: any;
-  unreadMessageCount: number = 0;
-  currentUserId!: string;
+  currentUserId: string = '';
   changeDetector: any;
-  userUnreadMessageCounts: Map<string, number> = new Map<string, number>();
-  receiverUnreadCounts: { [receiverId: string]: number } = {};
   receivedMessage: any;
-  unreadMessageCountSubscription!: Subscription;
   channels: any[] = [];
   
 
   
   
 
-  constructor(private userService: UserService, private router: Router, private ChatService: ChatService, private SignalrService: SignalrService, private ChannelService: ChannelService) { }
+  constructor(private userService: UserService, private router: Router, private ChatService: ChatService, private SignalrService: SignalrService, private ChannelService: ChannelService)
+  {
+     const jwtToken = localStorage.getItem('token');
+    console.log('JWT Token:', jwtToken);
 
+    if (jwtToken) {
+      try {
+       
+        const tokenPayload = JSON.parse(atob(jwtToken.split('.')[1]));
+        console.log('Token Payload:', tokenPayload);
+
+
+       
+        this.currentUserId = tokenPayload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier'];
+        console.log(this.currentUserId);
+      } catch (error) {
+        console.error('Error parsing JWT token:', error);
+      }
+    }
+   }
+
+  
   ngOnInit(): void {
     // Fetch the list of users
+     if (this.currentUserId) {
+     
+      this.loadChannels();
+     }
+     
+     else {
+       
+    }
+  
    
+  
    
     this.userService.retrieveUsers().subscribe(
       (res) => {
         this.users = res.map((user) => ({ ...user, userId: user.id }));
-        this.loadChannels(); // Load channels after loading users
+        this.loadChannels(); 
+       
       }),
 
         // Subscribe to updates for each user's unread message count
         this.users.forEach((user) => {
-          this.userUnreadMessageCounts.set(user.userId, 0);
+         
           this.showMessage(user.id);
-          this.subscribeToUnreadMessageCount(user.userId);
         });
       (error: any) => {
         console.error('Error fetching users:', error);
@@ -62,50 +90,16 @@ export class ChatComponent implements OnInit {
   }
 
   loadChannels() {
-    // Fetch the list of channels
-    const userId = this.currentUserId;
-    this.ChannelService.getChannels(userId).subscribe(
+    // Fetch the list of channels based on the user's ID
+    this.ChannelService.getChannels().subscribe(
       (res) => {
         this.channels = res;
+        console.log(res);
       },
       (error) => {
         console.error('Error fetching channels:', error);
       }
     );
-  }
-
- 
-
-  subscribeToUnreadMessageCount(userId: string): void {
-    // Subscribe to changes in unread message count for the user
-    this.ChatService.getUnreadMessageCount(userId).subscribe(
-      (count: any) => {
-        // Update the user's unreadMessageCount property
-        this.userUnreadMessageCounts.set(userId, count);
-        console.log("con", count);
-      },
-      (error) => {
-        console.error('Error fetching unread message count:', error);
-      }
-    );
-  
-  
-  
-
-    this.SignalrService.allMessagesRead$.subscribe((receiverId) => {
-      if (receiverId) {
-        console.log(`All messages are marked as read for receiver with ID: ${receiverId}`);
-      }
-    });
-
-    
-    this.SignalrService.unreadMessageCount$.subscribe((count: any) => {
-      // Update the unreadMessageCount in real-time
-      this.unreadMessageCount = count;
-      console.log(count, "hfdushf");
-      
-    });
-      
   }
 
   onUserClick(user: any) {
@@ -117,7 +111,6 @@ export class ChatComponent implements OnInit {
 
  showMessage(id: string) {
     this.router.navigate(['/chat', { outlets: { childPopup: ['user', id] } }]);
-
     const user = this.users.find((u) => u.id === id);
 
     if (user) {
@@ -126,34 +119,14 @@ export class ChatComponent implements OnInit {
           if (!message.seen) {
             message.seen = true;
 
-            const userUnreadCount = this.userUnreadMessageCounts.get(id) || 0;
-            console.log("t5t", userUnreadCount);
-            this.userUnreadMessageCounts.set(
-              id,
-              Math.max(userUnreadCount - 1, 0),
-              );
-
-            this.ChatService.markAllMessagesAsRead(this.currentReceiver).subscribe(
-              () => {
-                // Update the unread message count for this user
-                const updatedCount = Math.max(userUnreadCount - 1, 0);
-                this.userUnreadMessageCounts.set(id, updatedCount);
-
-                // Update the receiverUnreadCounts object for this receiver
-                this.receiverUnreadCounts[id] = updatedCount;
-              },
-              (error) => {
-                console.error('Error marking message as seen:', error);
-              }
-            );
           }
         });
       }
     }
   }
 
-    onChannelClick(channel: any) {
-  // Handle channel click, e.g., navigate to chat window with the channel ID
+  onChannelClick(channel: any) {
+ 
   this.router.navigate(['/chat',  { outlets: { childPopup: ['chat', channel] } }]);
 }
 }

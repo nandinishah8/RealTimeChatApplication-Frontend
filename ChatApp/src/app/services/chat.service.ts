@@ -65,16 +65,7 @@ export class ChatService {
           console.log('getMessages response:', response);
           // Mark incoming messages as seen
           const messages = response.messages.map((message: any) => {
-            if (message.receiverId === userId && !message.seen) {
-              this.markAllMessagesAsRead(message.receiverId).subscribe(
-                () => {
-                  message.seen = true;
-                },
-                (error) => {
-                  console.error('Error marking message as seen:', error);
-                }
-              );
-            }
+          
             return message;
           });
           return messages;
@@ -123,24 +114,4 @@ export class ChatService {
       headers: headers,
     });
   }
-
-  markAllMessagesAsRead(receiverId: string): Observable<any> {
-    const headers = new HttpHeaders({
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${this.user.getToken()}`,
-    });
-
-    return this.http.post<any>(`${this.url}/mark-all-as-read/${receiverId}`,  { headers: headers });
-  }
-  
-  
-
-  getUnreadMessageCount(userId: any): Observable<any> {
-  const headers = new HttpHeaders({
-    'Content-Type': 'application/json',
-    Authorization: `Bearer ${this.user.getToken()}`,
-  });
-
-  return this.http.get<any>(`${this.url}/unread-counts/${userId}`, { headers: headers });
-}
 }

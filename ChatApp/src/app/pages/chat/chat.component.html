@@ -27,6 +27,67 @@
 
                                 </div>
                             </li>
+                            <!-- Button to Add Channels -->
+                            <div class="add-channel-button">
+                                <button (click)="showAddChannelModal()">Add Channel</button>
+                            </div>
+
+                            <!-- Modal for Adding Channels -->
+                            <div *ngIf="showModal" class="modal">
+                                <div class="modal-content">
+                                    <span class="close" (click)="hideAddChannelModal()">&times;</span>
+                                    <h2>Create a New Channel</h2>
+                                    <form (ngSubmit)="createChannel()">
+                                        <label for="channelName">Channel Name:</label>
+                                        <input type="text" id="channelName" name="channelName"
+                                            [(ngModel)]="newChannelName" required>
+                                        <br>
+                                        <label for="channelDescription">Channel Description:</label>
+                                        <input type="text" id="channelDescription" name="channelDescription"
+                                            [(ngModel)]="newChannelDescription" required>
+                                        <br>
+                                        <label for="channelMembers">Select Users:</label>
+                                        <select multiple id="channelMembers" name="channelMembers"
+                                            [(ngModel)]="selectedUsers">
+                                            <option *ngFor="let user of users" [ngValue]="user.id">{{ user.name }}
+                                            </option>
+                                        </select>
+                                        <br>
+                                        <button type="submit">Create Channel</button>
+                                    </form>
+                                </div>
+                            </div>
+                            <!-- ... (other code) ... -->
+
+                            <!-- Button to Add Members to Channel -->
+                            <div class="add-members-button">
+                                <button (click)="showAddMembersModals()">Add Members to Channel</button>
+                            </div>
+
+                            <!-- Modal for Adding Members to Channel -->
+                            <div *ngIf="showAddMembersModal" class="modal">
+                                <div class="modal-content">
+                                    <span class="close" (click)="hideAddMembersModal()">&times;</span>
+                                    <h2>Add Members to Channel</h2>
+                                    <form (ngSubmit)="addMembersToChannel()">
+                                        <label for="channelSelect">Select a Channel:</label>
+                                        <select id="channelSelect" [(ngModel)]="selectedChannel" name="selectedChannel"
+                                            required>
+                                            <option *ngFor="let channel of channels" [ngValue]="channel.channelId">{{
+                                                channel.name }}</option>
+                                        </select>
+                                        <label for="memberSelect">Select Users:</label>
+                                        <select multiple id="memberSelect" [(ngModel)]="selectedUsers"
+                                            name="selectedUsers">
+                                            <option *ngFor="let user of users" [ngValue]="user.id">{{ user.name }}
+                                            </option>
+                                        </select>
+                                        <br>
+                                        <button type="submit">Add Members</button>
+                                    </form>
+                                </div>
+                            </div>
+
                             <div class="column-border"></div>
                             <ul class="list-unstyled chat-list mt-2 mb-0">
                                 <li *ngFor="let channel of channels" class="clearfix"
@@ -37,7 +98,6 @@
                                         </div>
                                         <div class="about">
                                             <div class="name">{{ channel.name }}</div>
-                                            <!-- <div class="description">{{ channel.description }}</div> -->
                                         </div>
 
                                     </div>

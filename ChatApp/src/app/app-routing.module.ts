@@ -5,6 +5,7 @@ import { LoginComponent } from './pages/login/login.component';
 import { ChatComponent } from './pages/chat/chat.component';
 import { ConversationComponent } from './pages/conversation/Conversation.component';
 import { RequestLogsComponent } from './pages/request-logs/request-logs.component';
+import { ChatChannelComponent } from './pages/chat-channel/chat-channel.component';
 
 
 const routes: Routes = [
@@ -30,11 +31,15 @@ const routes: Routes = [
     children: [
       {
         path: 'chat/:channelId',
-        component: ConversationComponent,
+        component: ChatChannelComponent,
         outlet: 'childPopup',
       },
     ],
   },
+  {
+    path: 'channel-chat',
+    component: ChatChannelComponent,
+  }
 ];
 
 @NgModule({

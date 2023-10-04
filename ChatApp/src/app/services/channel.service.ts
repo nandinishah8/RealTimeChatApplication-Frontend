@@ -20,7 +20,12 @@ export class ChannelService {
   });
 
   return this.http.get<any[]>(`http://localhost:5243/api/Channels/UserId`, {headers: headers});
-}
+  }
+  
+   createChannel(newChannel: any): Observable<any> {
+    // Send a POST request to create a new channel
+    return this.http.post(`http://localhost:5243/api/Channels`, newChannel);
+  }
 
   // Fetch channel details by ID
   getChannelDetails(channelId: number): Observable<any> {
@@ -28,9 +33,15 @@ export class ChannelService {
   }
 
   // Add members to a channel
-  addMembersToChannel(channelId: number, memberIds: string[]): Observable<any> {
-    return this.http.post(`${this.url}/Channels/${channelId}/addMembers`, memberIds);
-  }
+ addMembersToChannel(channelId: any, memberIds: string[]): Observable<any> {
+  const body = {
+    channelId: channelId,
+    userIds: memberIds
+  };
+  
+  return this.http.post(`http://localhost:5243/api/Channels/addMembers`, body);
+}
+
 
 }
 

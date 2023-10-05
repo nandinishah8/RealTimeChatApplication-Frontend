@@ -4,21 +4,36 @@
 <head>
     <meta charset="utf-8" />
     <title>Chat App</title>
-    <!-- <link rel="stylesheet" type="text/css" media="screen" href="../chat/chat.component.css" /> -->
+
     <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" />
 </head>
 
 <body>
     <div id="chat-container">
-        <!-- <div id="side-bar">
-            <app-chat></app-chat>
-        </div> -->
+
 
         <div id="chat-window">
             <div class="message-search">
                 <input type="text" placeholder="Search messages..." [(ngModel)]="searchQuery" />
                 <button (click)="searchMessages()">Search</button>
             </div>
+            <!-- Users symbol to show available users -->
+            <div class="chat-users-icon" (click)="toggleUserList()">
+                <i class="fa fa-users" aria-hidden="true"></i>
+            </div>
+
+            <!-- User list area (hidden by default) -->
+            <div class="user-list" *ngIf="showUserList">
+                <h3>Available Users</h3>
+                <ul>
+                    <li *ngFor="let user of channelUsers">
+                        <span> {{ user.name }}</span>
+                    </li>
+                </ul>
+            </div>
+
+
+
             <nav class="navbar">
                 <div class="container-fluid" style="justify-content: start;">
                     <a class="navbar-brand">

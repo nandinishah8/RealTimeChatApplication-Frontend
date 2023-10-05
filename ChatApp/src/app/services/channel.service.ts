@@ -28,7 +28,7 @@ export class ChannelService {
   }
 
   // Fetch channel details by ID
-  getChannelDetails(channelId: number): Observable<any> {
+  getChannelDetails(channelId: any): Observable<any> {
     return this.http.get<any>(`${this.url}/Channels/${channelId}`);
   }
 
@@ -40,6 +40,11 @@ export class ChannelService {
   };
   
   return this.http.post(`http://localhost:5243/api/Channels/addMembers`, body);
+  }
+  
+ getMembersInChannel(channelId: any): Observable<any[]> {
+
+  return this.http.get<any[]>(`http://localhost:5243/api/Channels/members/${channelId}`);
 }
 
 

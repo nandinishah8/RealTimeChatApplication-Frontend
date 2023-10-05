@@ -1,6 +1,7 @@
 import { Component, OnInit, ChangeDetectorRef, NgZone } from '@angular/core';
 import { ChatService } from '../../services/chat.service';
 import { SignalrService } from '../../services/signalr.service';
+import { ChannelService } from '../../services/channel.service';
 import * as signalR from '@microsoft/signalr';
 import { ActivatedRoute } from '@angular/router';
 import { UserService } from '../../services/user.service';
@@ -16,7 +17,7 @@ import { MessageDto } from 'Dto/MessageDto';
 export class  ChatChannelComponent implements OnInit {
   currentUserId: string;
   senderId!: string;
-  currentReceiverId!: string;
+  currentReceiverId: string = '';
   currentReceiver: any = {};
   outgoingMessages: any[] = [];
   incomingMessages: any[] = [];
@@ -30,6 +31,8 @@ export class  ChatChannelComponent implements OnInit {
   searchQuery: string = '';
   unreadMessageCount: number = 0;
   messageId!: string;
+  showUserList: boolean = false;
+  channelUsers: any[] = [];
 
    constructor(
     private route: ActivatedRoute,
@@ -37,6 +40,7 @@ export class  ChatChannelComponent implements OnInit {
     private chatService: ChatService,
     private signalrService: SignalrService,
     private changeDetector: ChangeDetectorRef,
+    private ChannelService: ChannelService,
     private ngZone: NgZone,
     private http: HttpClient
   ) {
@@ -44,10 +48,9 @@ export class  ChatChannelComponent implements OnInit {
   }
 
   ngOnInit(): void {
-   
     this.route.params.subscribe((params) => {
-      const userId = params['userId'];
-      this.currentReceiverId = userId;
+      const channelId = params['channelId'];
+      this.currentReceiverId = channelId;
 
       console.log('currentReceiverId:', this.currentReceiverId);
 
@@ -61,7 +64,7 @@ export class  ChatChannelComponent implements OnInit {
         this.selectedBefore,
         this.selectedAfter
       )
-      
+       this.fetchChannelMembers();
     });
 
 
@@ -271,6 +274,27 @@ export class  ChatChannelComponent implements OnInit {
       message.deleteMode = true;
       message.showContextMenu = true;
     }
+  }
+
+    toggleUserList() {
+    this.showUserList = !this.showUserList;
+
+    if (this.showUserList) {
+      // Fetch and display members when user list is opened
+      this.fetchChannelMembers();
+    }
+  }
+
+  fetchChannelMembers() {
+
+    this.ChannelService.getMembersInChannel(this.currentReceiverId).subscribe(
+      (members) => {
+        this.channelUsers = members;
+      },
+      (error) => {
+        console.error('Error fetching channel members:', error);
+      }
+    );
   }
 
 }

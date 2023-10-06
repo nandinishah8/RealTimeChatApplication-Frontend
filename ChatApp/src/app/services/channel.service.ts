@@ -22,9 +22,13 @@ export class ChannelService {
   return this.http.get<any[]>(`http://localhost:5243/api/Channels/UserId`, {headers: headers});
   }
   
-   createChannel(newChannel: any): Observable<any> {
+  createChannel(newChannel: any): Observable<any> {
+    const token = localStorage.getItem('auth_token');
+      const headers = new HttpHeaders({
+    'Authorization': `Bearer ${token}`
+  });
     // Send a POST request to create a new channel
-    return this.http.post(`http://localhost:5243/api/Channels`, newChannel);
+    return this.http.post(`http://localhost:5243/api/Channels`, newChannel, { headers: headers});
   }
 
   // Fetch channel details by ID

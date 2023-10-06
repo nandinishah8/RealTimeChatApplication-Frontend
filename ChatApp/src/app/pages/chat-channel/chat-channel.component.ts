@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef, NgZone } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, NgZone, Input } from '@angular/core';
 import { ChatService } from '../../services/chat.service';
 import { SignalrService } from '../../services/signalr.service';
 import { ChannelService } from '../../services/channel.service';
@@ -33,6 +33,8 @@ export class  ChatChannelComponent implements OnInit {
   messageId!: string;
   showUserList: boolean = false;
   channelUsers: any[] = [];
+ @Input() selectedChannel: any;
+  selectedUsers: any;
 
    constructor(
     private route: ActivatedRoute,
@@ -296,6 +298,48 @@ export class  ChatChannelComponent implements OnInit {
       }
     );
   }
+
+  
+
+  // // Method to delete a member from the channel
+  // deleteMemberFromChannel(userId: string) {
+
+  //   console.log(userId);
+  //   // Call the channel service to delete the member
+  //   console.log(this.selectedChannel);
+  //   this.ChannelService.deleteMembersFromChannel(this.selectedChannel.channelId, [userId]).subscribe(
+  //     (result) => {
+  //       console.log('Member deleted from the channel:', result);
+  //        this.fetchChannelMembers();
+        
+  //     },
+  //     (error) => {
+  //       console.error('Error deleting member from the channel:', error);
+  //     }
+  //   );
+  // }
+
+
+
+ deleteMemberFromChannel(userId: string) {
+  // Prepare the list of member IDs to be deleted from the channel
+  const memberIdsToDelete = [userId];
+
+  // Call the channel service to delete the members
+  this.ChannelService.deleteMembersFromChannel(this.currentReceiverId, memberIdsToDelete).subscribe(
+    (result) => {
+      // Members deleted from the channel successfully
+      console.log('Member deleted from the channel:', result);
+
+      // Fetch and display the updated channel members
+      this.fetchChannelMembers();
+    },
+    (error) => {
+      console.error('Error deleting member from the channel:', error);
+    }
+  );
+}
+
 
 }
   

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
 import { ChatService } from 'src/app/services/chat.service';
 
 @Injectable({
@@ -80,7 +80,44 @@ export class ChannelService {
 
     return this.http.delete<any>(`${this.url}/channels/${channelId}`, { headers });
   }
+
+
+  // deleteMembersFromChannel(channelId: any, memberIds: string[]): Observable<any> {
+      
+  //   const token = localStorage.getItem('auth_token');
+  //   if (!token) {
+  //     throw new Error('JWT token not found.');
+  //   }
+  //   const headers = new HttpHeaders({
+  //     Authorization: `Bearer ${token}`,
+  //   });
+
+   
+   
+  //   return this.http.delete(`http://localhost:5243/api/Channels/${channelId}/deleteMembers`, { body: { memberIds: memberIds } },);
+  // }
+
+
+  deleteMembersFromChannel(channelId: any, memberIds: string[]): Observable<any> {
+     const token = localStorage.getItem('auth_token');
+      const headers = new HttpHeaders({
+    'Authorization': `Bearer ${token}`
+  });
+
+   
+
+    console.log(memberIds);
+    const options = {
+      headers: headers,
+      body: { memberIds : memberIds }, 
+    };
+
+   
+
+    return this.http.delete(`http://localhost:5243/api/Channels/${channelId}/members`, options);
+  }
 }
+
 
 
 

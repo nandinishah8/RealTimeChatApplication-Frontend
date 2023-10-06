@@ -28,9 +28,11 @@
                 <ul>
                     <li *ngFor="let user of channelUsers">
                         <span> {{ user.name }}</span>
+                        <button class="delete-member-button" (click)="deleteMemberFromChannel(user.id)">Delete</button>
                     </li>
                 </ul>
             </div>
+
 
 
 
@@ -123,6 +125,7 @@
                 </div>
             </div>
         </div>
+
     </div>
 
 

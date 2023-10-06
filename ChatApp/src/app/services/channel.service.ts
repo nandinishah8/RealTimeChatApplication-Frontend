@@ -49,8 +49,39 @@ export class ChannelService {
  getMembersInChannel(channelId: any): Observable<any[]> {
 
   return this.http.get<any[]>(`http://localhost:5243/api/Channels/members/${channelId}`);
+  }
+  
+    updateChannel(channelId: any, name: string, description: string): Observable<any> {
+    const token = localStorage.getItem('auth_token');
+    if (!token) {
+      throw new Error('JWT token not found.');
+    }
+    const headers = new HttpHeaders({
+      Authorization: `Bearer ${token}`,
+    });
+
+    const body = {
+      name,
+      description,
+    };
+
+    return this.http.put<any>(`${this.url}/channels/${channelId}`, body, { headers });
+  }
+
+  // Delete a channel
+  deleteChannel(channelId: any): Observable<any> {
+    const token = localStorage.getItem('auth_token');
+    if (!token) {
+      throw new Error('JWT token not found.');
+    }
+    const headers = new HttpHeaders({
+      Authorization: `Bearer ${token}`,
+    });
+
+    return this.http.delete<any>(`${this.url}/channels/${channelId}`, { headers });
+  }
 }
 
 
-}
+
 

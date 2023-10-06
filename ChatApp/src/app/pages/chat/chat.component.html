@@ -57,7 +57,7 @@
                                     </form>
                                 </div>
                             </div>
-                            <!-- ... (other code) ... -->
+
 
                             <!-- Button to Add Members to Channel -->
                             <div class="add-members-button">
@@ -98,6 +98,20 @@
                                         </div>
                                         <div class="about">
                                             <div class="name">{{ channel.name }}</div>
+                                        </div>
+                                        <div *ngIf="!channel.editMode">
+                                            <button class="edit-button" (click)="openEditChannelModal(channel)">
+                                                <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                                            </button>
+                                            <button class="delete-button" (click)="deleteChannel(channel.channelId)">
+                                                <i class="fa fa-trash-o" aria-hidden="true"></i>
+                                            </button>
+                                        </div>
+                                        <div *ngIf="channel.editMode">
+
+                                            <input type="text" [(ngModel)]="channel.name" />
+                                            <input type="text" [(ngModel)]="channel.description" />
+                                            <button (click)="saveEditedChannel(channel)">Save</button>
                                         </div>
 
                                     </div>

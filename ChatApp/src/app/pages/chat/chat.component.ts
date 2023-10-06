@@ -155,7 +155,7 @@ export class ChatComponent implements OnInit {
   const newChannel = {
     name: channelName,
     description: channelDescription,
-    members: [currentUserId, ...this.selectedUsers], // Add selected users as members
+    members: [this.currentUserId, ...this.selectedUsers], // Add selected users as members
   };
 
   // Send a request to create the channel
@@ -176,7 +176,9 @@ export class ChatComponent implements OnInit {
       // Handle any errors from the server
       console.error('Error creating channel:', error);
     }
-  );
+   );
+   
+   
 }
 
 

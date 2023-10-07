@@ -36,6 +36,7 @@ export class ChatComponent implements OnInit {
   selectedChannel: any = null;
   channelEditForm: FormGroup;
   showEditModal!: boolean;
+  channelId: string = '';
 
   
 
@@ -282,6 +283,7 @@ saveEditedChannel(channel: any) {
       );
     }
   }
+
   
 }
 

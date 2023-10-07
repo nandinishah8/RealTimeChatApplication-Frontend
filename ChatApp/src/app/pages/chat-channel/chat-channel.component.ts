@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef, NgZone } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, NgZone, Input } from '@angular/core';
 import { ChatService } from '../../services/chat.service';
 import { SignalrService } from '../../services/signalr.service';
 import { ChannelService } from '../../services/channel.service';
@@ -33,6 +33,9 @@ export class  ChatChannelComponent implements OnInit {
   messageId!: string;
   showUserList: boolean = false;
   channelUsers: any[] = [];
+ @Input() selectedChannel: any;
+  selectedUsers: any;
+  channelMembers: any;
 
    constructor(
     private route: ActivatedRoute,
@@ -297,7 +300,29 @@ export class  ChatChannelComponent implements OnInit {
     );
   }
 
-}
+  
+ deleteMembersFromChannel(channelId: any, memberIds: string[]) {
+  this.ChannelService.deleteMembersFromChannel(channelId, memberIds).subscribe(
+    (response) => {
+      console.log("Members deleted from the channel successfully.");
+   
+       //  this.removeDeletedMembersFromList(memberIds);
+      this.fetchChannelMembers(); 
+    },
+    (error) => {
+      console.error("Error deleting members from the channel:", error);
+     
+    }
+  );
+  }
+  
+ }
+
+
+
+
+
+
   
   
 

@@ -52,6 +52,7 @@
                                             <option *ngFor="let user of users" [ngValue]="user.id">{{ user.name }}
                                             </option>
                                         </select>
+
                                         <br>
                                         <button type="submit">Create Channel</button>
                                     </form>
@@ -75,7 +76,9 @@
                                             required>
                                             <option *ngFor="let channel of channels" [ngValue]="channel.channelId">{{
                                                 channel.name }}</option>
+
                                         </select>
+
                                         <label for="memberSelect">Select Users:</label>
                                         <select multiple id="memberSelect" [(ngModel)]="selectedUsers"
                                             name="selectedUsers">
@@ -122,6 +125,7 @@
                 </div>
 
                 <router-outlet name="childPopup"></router-outlet>
+
 
 
             </div>

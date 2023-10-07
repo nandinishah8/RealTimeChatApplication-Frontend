@@ -82,40 +82,20 @@ export class ChannelService {
   }
 
 
-  // deleteMembersFromChannel(channelId: any, memberIds: string[]): Observable<any> {
-      
-  //   const token = localStorage.getItem('auth_token');
-  //   if (!token) {
-  //     throw new Error('JWT token not found.');
-  //   }
-  //   const headers = new HttpHeaders({
-  //     Authorization: `Bearer ${token}`,
-  //   });
-
-   
-   
-  //   return this.http.delete(`http://localhost:5243/api/Channels/${channelId}/deleteMembers`, { body: { memberIds: memberIds } },);
-  // }
-
-
   deleteMembersFromChannel(channelId: any, memberIds: string[]): Observable<any> {
-     const token = localStorage.getItem('auth_token');
-      const headers = new HttpHeaders({
+  const token = localStorage.getItem('auth_token');
+  const headers = new HttpHeaders({
     'Authorization': `Bearer ${token}`
   });
 
-   
+  const options = {
+    headers: headers,
+    body: memberIds,  
+  };
 
-    console.log(memberIds);
-    const options = {
-      headers: headers,
-      body: { memberIds : memberIds }, 
-    };
+  return this.http.delete<any>(`http://localhost:5243/api/Channels/${channelId}/members`, options);
+}
 
-   
-
-    return this.http.delete(`http://localhost:5243/api/Channels/${channelId}/members`, options);
-  }
 }
 
 

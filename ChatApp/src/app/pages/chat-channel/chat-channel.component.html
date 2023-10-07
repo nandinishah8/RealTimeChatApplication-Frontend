@@ -22,16 +22,19 @@
                 <i class="fa fa-users" aria-hidden="true"></i>
             </div>
 
-            <!-- User list area (hidden by default) -->
+            <!-- Add this inside the user-list div -->
             <div class="user-list" *ngIf="showUserList">
                 <h3>Available Users</h3>
                 <ul>
                     <li *ngFor="let user of channelUsers">
-                        <span> {{ user.name }}</span>
-                        <button class="delete-member-button" (click)="deleteMemberFromChannel(user.id)">Delete</button>
+                        <span>{{ user.name }}</span>
+                        <button class="delete-member-button"
+                            (click)="deleteMembersFromChannel(+currentReceiverId, [user.id])">Delete</button>
                     </li>
                 </ul>
             </div>
+
+
 
 
 

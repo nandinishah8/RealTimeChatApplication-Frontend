@@ -19,15 +19,9 @@ export class SignalrService {
   private sharedObj = new Subject<MessageDto>();
   private sharedEditedObj = new Subject<EditMessageDto>();
   private sharedDeletedObj = new Subject<Message>();
-  private messageSeenSubject: Subject<string> = new Subject<string>();
-  private unreadMessageCountSubject: Subject<number> = new Subject<number>();
-  public unreadMessageCount$: Observable<any> = this.unreadMessageCountSubject.asObservable();
-  private unreadMessageCount: number = 0;
-  private allMessagesReadSubject = new BehaviorSubject<string>('');
-  allMessagesRead$ = this.allMessagesReadSubject.asObservable();
- 
+  private channelMessagesSubject = new Subject<any>();
   changeDetector: any;
-  private unreadMessageCounts: { [userId: string]: number } = {};
+  
  
  
   
@@ -40,24 +34,14 @@ export class SignalrService {
     
      
     
-      this.hubConnection.on('ReceiveOne', (message: any, senderId: any, unreadMessageCount: number) => {
+      this.hubConnection.on('ReceiveOne', (message: any, senderId: any) => {
       const receivedMessageObject: MessageDto = {
         id: message.id,
         senderId: senderId,
         receiverId: message.receiverId,
         content: message.content,
-        seen: message.seen,
         };
         
-        console.log(unreadMessageCount);
-
-      if (!receivedMessageObject.seen) {
-        this.unreadMessageCount++;
-        this.unreadMessageCountSubject.next(this.unreadMessageCount);
-       
-        console.log(this.unreadMessageCount);
-      }
-
       this.sharedObj.next(receivedMessageObject);
     });
 
@@ -77,6 +61,11 @@ export class SignalrService {
       console.log(`Received deleted message with ID ${deletedMessage.id}`);
       this.sharedDeletedObj.next(deletedMessage);
     });
+
+     this.hubConnection.on('ReceiveChannelMessage', (message) => {
+      this.channelMessagesSubject.next(message);
+    });
+  
 
    
     this.startConnection();
@@ -142,26 +131,27 @@ export class SignalrService {
     }
   }
 
-  markAllMessagesAsRead(receiverId: string): void {
-    if (this.hubConnection.state === signalR.HubConnectionState.Connected) {
-      this.hubConnection
-        .invoke('MarkAllMessagesAsRead', receiverId)
-        .then((response: any) => {
-          console.log('Response from MarkAllMessagesAsRead:', response);
-       
-          if (response === "All messages marked as read.") {
-         
-          } else {
-          
-          }
+  sendChannelMessage(message: any) {
+      if (this.hubConnection.state === signalR.HubConnectionState.Connected) {
+        this.hubConnection.invoke('SendChannelMessage', message)
+        .then(() => {
+          console.log('message sent successfully');
         })
-        .catch((error) => {
-          console.error('Error invoking MarkAllMessagesAsRead:', error);
-      
+         .catch((error) => {
+          console.error('Error sending  message:', error);
         });
+    } else {
+      console.warn('SignalR connection is not established yet.');
     }
   }
 
+  // Create a method to receive channel messages as an observable
+  receiveChannelMessages(): Observable<any> {
+    
+    return this.channelMessagesSubject.asObservable();
+  }
+
+ 
    
    
   

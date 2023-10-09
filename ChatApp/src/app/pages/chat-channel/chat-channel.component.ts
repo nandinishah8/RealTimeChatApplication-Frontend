@@ -120,6 +120,27 @@ export class  ChatChannelComponent implements OnInit {
     if (savedMessages) {
       this.messages = JSON.parse(savedMessages);
     }
+
+  this.signalrService.receiveChannelMessages().subscribe((receivedMessage: any) => {
+  console.log('Received channel message:', receivedMessage);
+
+  
+  if (receivedMessage.channelId === this.currentReceiverId) {
+  
+    if (receivedMessage.senderId !== this.currentUserId) {
+      
+      this.messages.push({
+        id: receivedMessage.id, 
+        channelId: receivedMessage.channelId,
+        content: receivedMessage.content,
+        senderId: receivedMessage.senderId,
+      });
+      this.messages.push(receivedMessage);
+      this.changeDetector.detectChanges();
+    }
+  }
+});
+
   }
   
 
@@ -316,7 +337,37 @@ export class  ChatChannelComponent implements OnInit {
   );
   }
   
- }
+  sendMessageToChannel() {
+  if (this.messageContent.trim() === '') {
+    // Don't send an empty message
+    return;
+  }
+
+  this.ChannelService.sendMessageToChannel(this.currentReceiverId, this.messageContent).subscribe(
+    (response) => {
+      this.messageContent = '';
+      console.log(response);
+      if (response) {
+        this.signalrService.sendChannelMessage(response);
+        this.messages.push({
+          id: response.id,
+          channelId: response.channelId,
+          content: response.content,
+        });
+
+        this.changeDetector.detectChanges();
+      } else {
+      
+        console.error('Error sending message:', response.error);
+      }
+    },
+    (error) => {
+      console.error('Error sending message:', error);
+    }
+  );
+}
+
+}
 
 
 

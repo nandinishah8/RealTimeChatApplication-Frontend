@@ -44,13 +44,13 @@ export class ChatComponent implements OnInit {
   
 
   constructor(private userService: UserService, private router: Router, private ChatService: ChatService, private SignalrService: SignalrService, private ChannelService: ChannelService, private formBuilder: FormBuilder) {
-    const jwtToken = localStorage.getItem('token');
-    console.log('JWT Token:', jwtToken);
+    const token = localStorage.getItem('token');
+    console.log('JWT Token:', token);
 
-    if (jwtToken) {
+    if (token) {
       try {
        
-        const tokenPayload = JSON.parse(atob(jwtToken.split('.')[1]));
+        const tokenPayload = JSON.parse(atob(token.split('.')[1]));
         console.log('Token Payload:', tokenPayload);
         this.currentUserId = tokenPayload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier'];
         console.log(this.currentUserId);

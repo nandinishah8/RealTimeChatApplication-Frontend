@@ -73,6 +73,42 @@ export class ChatService {
       );
   }
 
+  getChannelMessages(channelId: string, sort: string, order: string, count: number, before: string, after: string): Observable<any[]> {
+  let token = localStorage.getItem('auth_token');
+  const headers = new HttpHeaders({
+    'Content-Type': 'application/json',
+    Authorization: `Bearer ${token}`,
+  });
+
+  let params = new HttpParams()
+    .set('sort', sort)
+    .set('order', order)
+    .set('count', count.toString());
+
+  if (before) {
+    params = params.set('before', before);
+  }
+
+  if (after) {
+    params = params.set('after', after);
+  }
+
+  return this.http.get<any[]>(`http://localhost:5243/api/Messages/${channelId}/messages`, {
+    headers: headers,
+    params: params,
+  })
+  .pipe(
+    map((response: any) => {
+     const messages = response.channelMessages.map((message: any) => {
+          
+            return message;
+          });
+      return messages;
+    })
+  );
+}
+
+
   searchMessages(query: string): Observable<any[]> {
     const headers = new HttpHeaders({
       'Content-Type': 'application/json',

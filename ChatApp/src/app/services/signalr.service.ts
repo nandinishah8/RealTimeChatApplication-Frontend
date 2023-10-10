@@ -151,12 +151,7 @@ export class SignalrService {
     return this.channelMessagesSubject.asObservable();
   }
 
- 
-   
-   
-  
 
-   
   public retrieveDeletedObject(): Subject<Message> {
     return this.sharedDeletedObj;
   }

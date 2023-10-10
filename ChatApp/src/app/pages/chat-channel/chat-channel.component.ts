@@ -8,13 +8,14 @@ import { UserService } from '../../services/user.service';
 import { HttpClient } from '@angular/common/http';
 import { EditMessageDto } from 'Dto/EditMessageDto';
 import { MessageDto } from 'Dto/MessageDto';
+import jwt_decode from 'jwt-decode';
 
 @Component({
   selector: 'app-chat-channel',
   templateUrl: './chat-channel.component.html',
   styleUrls: ['./chat-channel.component.css']
 })
-export class  ChatChannelComponent implements OnInit {
+export class ChatChannelComponent implements OnInit {
   currentUserId: string;
   senderId!: string;
   currentReceiverId: string = '';
@@ -22,6 +23,7 @@ export class  ChatChannelComponent implements OnInit {
   outgoingMessages: any[] = [];
   incomingMessages: any[] = [];
   messages: any[] = [];
+  channelMessages: any;
   messageContent: string = '';
   selectedSort: string = 'timestamp';
   selectedOrder: string = 'desc';
@@ -33,11 +35,11 @@ export class  ChatChannelComponent implements OnInit {
   messageId!: string;
   showUserList: boolean = false;
   channelUsers: any[] = [];
- @Input() selectedChannel: any;
+  @Input() selectedChannel: any;
   selectedUsers: any;
   channelMembers: any;
 
-   constructor(
+  constructor(
     private route: ActivatedRoute,
     private userService: UserService,
     private chatService: ChatService,
@@ -57,7 +59,8 @@ export class  ChatChannelComponent implements OnInit {
 
       console.log('currentReceiverId:', this.currentReceiverId);
 
-      
+      this.getchannelMessages(channelId);
+      this.decode_token();
 
       this.getMessages(
         this.currentReceiverId,
@@ -67,7 +70,7 @@ export class  ChatChannelComponent implements OnInit {
         this.selectedBefore,
         this.selectedAfter
       )
-       this.fetchChannelMembers();
+      this.fetchChannelMembers();
     });
 
 
@@ -120,8 +123,36 @@ export class  ChatChannelComponent implements OnInit {
     if (savedMessages) {
       this.messages = JSON.parse(savedMessages);
     }
-  }
+
+    this.signalrService.receiveChannelMessages().subscribe((receivedMessage: any) => {
+      console.log('Received channel message:', receivedMessage);
+
   
+      if (receivedMessage.channelId === this.currentReceiverId) {
+  
+        if (receivedMessage.senderId !== this.currentUserId) {
+      
+          this.messages.push({
+            id: receivedMessage.id,
+            channelId: receivedMessage.channelId,
+            content: receivedMessage.content,
+            senderId: receivedMessage.senderId,
+          });
+          this.channelMessages.push(receivedMessage);
+          this.changeDetector.detectChanges();
+        }
+      }
+    });
+
+  }
+
+  getchannelMessages(channelId: any) {
+    this.ChannelService.getMessages(channelId).subscribe((res) => {
+      console.log(res);
+      this.channelMessages = res;
+    });
+    console.log(channelId);
+  }
 
   getMessages(
     userId: string,
@@ -167,46 +198,19 @@ export class  ChatChannelComponent implements OnInit {
     });
   }
 
-  sendMessage() {
-    if (this.messageContent.trim() === '') {
-      // Don't send an empty message
-      return;
-    }
-
-
-    this.chatService
-      .sendMessage(this.currentReceiverId, this.messageContent.trim())
-      .subscribe(
-        (response) => {
-          this.messageContent = '';
-          console.log(response);
-          // Handle the response from the backend if needed
-          const message = {
-            id: response.id,
-            receiverId: response.receiverId,
-            content: response.content,
-          };
-
-         
-          this.signalrService.sendMessage(message, response.senderId);
-        },
-        (error) => {
-          console.error('Error sending message:', error);
-        }
-      );
-  }
+  
 
   onContextMenu(event: MouseEvent, message: any) {
     event.preventDefault();
     if (message.senderId !== this.currentReceiverId) {
       message.isEvent = !message.isEvent;
     }
-    this.sendMessage();
+    this.sendMessageToChannel();
   }
 
 
   onAcceptEdit(message: any) {
-    // Update the message content with edited content
+    
     message.content = message.editedContent;
     message.editMode = false;
     console.log(message);
@@ -253,7 +257,7 @@ export class  ChatChannelComponent implements OnInit {
       () => {
         const index = this.messages.findIndex((m) => m.id === message.id);
         if (index !== -1) {
-          this.messages.splice(index, 1); 
+          this.messages.splice(index, 1);
         }
 
         // Send a delete request using SignalR
@@ -279,7 +283,7 @@ export class  ChatChannelComponent implements OnInit {
     }
   }
 
-    toggleUserList() {
+  toggleUserList() {
     this.showUserList = !this.showUserList;
 
     if (this.showUserList) {
@@ -301,22 +305,63 @@ export class  ChatChannelComponent implements OnInit {
   }
 
   
- deleteMembersFromChannel(channelId: any, memberIds: string[]) {
-  this.ChannelService.deleteMembersFromChannel(channelId, memberIds).subscribe(
-    (response) => {
-      console.log("Members deleted from the channel successfully.");
+  deleteMembersFromChannel(channelId: any, memberIds: string[]) {
+    this.ChannelService.deleteMembersFromChannel(channelId, memberIds).subscribe(
+      (response) => {
+        console.log("Members deleted from the channel successfully.");
    
-       //  this.removeDeletedMembersFromList(memberIds);
-      this.fetchChannelMembers(); 
-    },
-    (error) => {
-      console.error("Error deleting members from the channel:", error);
+        //  this.removeDeletedMembersFromList(memberIds);
+        this.fetchChannelMembers();
+      },
+      (error) => {
+        console.error("Error deleting members from the channel:", error);
      
-    }
-  );
+      }
+    );
   }
   
- }
+  sendMessageToChannel() {
+    if (this.messageContent.trim() === '') {
+      // Don't send an empty message
+      return;
+    }
+
+    this.ChannelService.sendMessageToChannel(this.currentReceiverId, this.messageContent).subscribe(
+      (response) => {
+        this.messageContent = '';
+        console.log(response);
+        if (response) {
+          this.signalrService.sendChannelMessage(response);
+          this.messages.push({
+            id: response.id,
+            channelId: response.channelId,
+            content: response.content,
+          });
+
+          this.changeDetector.detectChanges();
+        } else {
+      
+          console.error('Error sending message:', response.error);
+        }
+      },
+      (error) => {
+        console.error('Error sending message:', error);
+      }
+    );
+  }
+  
+  decode_token() {
+    const token = localStorage.getItem("auth_token");
+    if (token) {
+      const decodedToken: any = jwt_decode(token);
+      console.log(decodedToken, "is the");
+     const userId = decodedToken['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier'];
+      console.log("The userId id", userId);
+      this.currentUserId = userId;
+    }
+
+  }
+}
 
 
 

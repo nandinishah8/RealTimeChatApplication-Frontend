@@ -85,9 +85,10 @@
             <div class="chat-container">
 
                 <div class="chat-messages" style="height: 492px;">
-                    <div [ngClass]="{'chat-message outgoing': message?.senderId !== currentReceiverId, 'chat-message incoming': message?.senderId === currentReceiverId, 'seen-message': message.seen}"
-                        *ngFor="let message of messages" (contextmenu)="onContextMenu($event, message)">
+                    <div [ngClass]="{'chat-message outgoing': message?.senderId === currentUserId, 'chat-message incoming': message?.senderId !== currentUserId}"
+                        *ngFor="let message of channelMessages" (contextmenu)="onContextMenu($event, message)">
                         <span class="message-content" *ngIf="!message.editMode && !message.deleteMode">
+                            <p>{{ message.senderName }} </p>
                             <p>{{message.content}} </p>
                             <p>{{ message.timestamp | date }}</p>
 
@@ -124,7 +125,7 @@
                 <!-- Chat Input -->
                 <div class="chat-input">
                     <input type="text" placeholder="Type your message..." [(ngModel)]="messageContent" />
-                    <button class="send-button" (click)="sendMessage()"><i class="fa fa-send"></i></button>
+                    <button class="send-button" (click)="sendMessageToChannel()"><i class="fa fa-send"></i></button>
                 </div>
             </div>
         </div>

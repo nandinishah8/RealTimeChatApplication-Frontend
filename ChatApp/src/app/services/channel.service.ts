@@ -2,12 +2,13 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { ChatService } from 'src/app/services/chat.service';
+import { SignalrService } from './signalr.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ChannelService {
-   constructor(private http: HttpClient) { }
+   constructor(private http: HttpClient, private SignalrService: SignalrService) { }
   url = 'http://localhost:5243/api';
    
   getChannels(): Observable<any[]> {
@@ -94,7 +95,32 @@ export class ChannelService {
   };
 
   return this.http.delete<any>(`http://localhost:5243/api/Channels/${channelId}/members`, options);
-}
+  }
+  
+  sendMessageToChannel(channelId: string, content: string): Observable<any> {
+     const token = localStorage.getItem('auth_token');
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    });
+
+    const body = {
+     
+      ChannelId: channelId,
+      Content: content,
+    };
+
+    return this.http.post<any>(`http://localhost:5243/api/Messages/Channels/messages`, body, { headers: headers });
+  }
+
+  // Extend your code to receive messages from SignalR
+  // receiveChannelMessages(channelId:any): Observable<any> {
+  //   return this.SignalrService.receiveChannelMessages();
+  // }
+
+  getMessages(channelId: any) {
+    return this.http.get<any>(`http://localhost:5243/api/Messages/${channelId}/messages`, channelId);
+  }
 
 }
 

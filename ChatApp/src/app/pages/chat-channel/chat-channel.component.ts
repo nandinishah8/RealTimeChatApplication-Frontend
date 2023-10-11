@@ -276,13 +276,32 @@ export class ChatChannelComponent implements OnInit {
   }
 
 
-  onDeleteMessage(message: any) {
-    if (message.senderId !== this.currentReceiverId) {
-      message.deleteMode = true;
-      message.showContextMenu = true;
-    }
-  }
+  // onDeleteMessage(message: any) {
+  //   if (message.senderId !== this.currentReceiverId) {
+  //     message.deleteMode = true;
+  //     message.showContextMenu = true;
+  //   }
+  // }
 
+  onDeleteMessage(message: any) {
+  // Check if the sender is the current user
+  if (message.senderId === this.currentUserId) {
+    this.chatService.deleteMessage(message.id).subscribe(
+      () => {
+        const index = this.channelMessages.findIndex((m: any) => m.id === message.id);
+        if (index !== -1) {
+          this.channelMessages.splice(index, 1);
+        }
+
+        // Send a delete request using SignalR
+        this.signalrService.deleteMessage(message.id);
+      },
+      (error) => {
+        console.error('Error deleting message:', error);
+      }
+    );
+  }
+}
   toggleUserList() {
     this.showUserList = !this.showUserList;
 
@@ -332,13 +351,16 @@ export class ChatChannelComponent implements OnInit {
         console.log(response);
         if (response) {
           this.signalrService.sendChannelMessage(response);
-          this.messages.push({
-            id: response.id,
-            channelId: response.channelId,
-            content: response.content,
-          });
-
+          this.messages.push(response); 
           this.changeDetector.detectChanges();
+          //this.messages = response;
+          // this.messages.push({
+          //   id: response.id,
+          //   channelId: response.channelId,
+          //   content: response.content,
+          // });
+          
+          //this.changeDetector.detectChanges();
         } else {
       
           console.error('Error sending message:', response.error);

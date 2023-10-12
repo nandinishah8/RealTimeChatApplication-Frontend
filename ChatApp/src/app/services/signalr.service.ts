@@ -66,6 +66,7 @@ export class SignalrService {
       this.channelMessagesSubject.next(message);
     });
   
+    
 
    
     this.startConnection();
@@ -144,6 +145,29 @@ export class SignalrService {
       console.warn('SignalR connection is not established yet.');
     }
   }
+
+  deleteChannelMessage(messageId: any): void {
+  if (this.hubConnection.state === signalR.HubConnectionState.Connected) {
+    this.hubConnection
+      .invoke('DeleteChannelMessage', messageId)
+      .then(() => {
+        console.log('Deleted channel message sent successfully');
+      })
+      .catch((error) => {
+        console.error('Error sending deleted channel message:', error);
+      });
+  } else {
+    console.warn('SignalR connection is not established yet.');
+  }
+  }
+  
+  receiveDeletedChannelMessage() {
+  return new Observable((subscriber) => {
+    this.hubConnection.on('ReceiveDeletedChannelMessage', (messageId: any) => {
+      subscriber.next(messageId);
+    });
+  });
+}
 
   // Create a method to receive channel messages as an observable
   receiveChannelMessages(): Observable<any> {

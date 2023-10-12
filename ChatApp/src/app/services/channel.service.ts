@@ -122,6 +122,19 @@ export class ChannelService {
     return this.http.get<any>(`http://localhost:5243/api/Messages/${channelId}/messages`, channelId);
   }
 
+    deleteMessage(channelId: any, messageId: any): Observable<any> {
+    const token = localStorage.getItem('auth_token');
+      const headers = new HttpHeaders({
+       'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    });
+
+    return this.http.delete(`http://localhost:5243/api/Messages/channelMessage?id=${channelId}&channelId=${messageId}`, { headers });
+  }
+
+
+
+
 }
 
 

@@ -62,14 +62,14 @@ export class ChatChannelComponent implements OnInit {
       this.getchannelMessages(channelId);
       this.decode_token();
 
-      this.getMessages(
-        this.currentReceiverId,
-        this.selectedSort,
-        this.selectedOrder,
-        this.selectedCount,
-        this.selectedBefore,
-        this.selectedAfter
-      )
+      // this.getMessages(
+      //   this.currentReceiverId,
+      //   this.selectedSort,
+      //   this.selectedOrder,
+      //   this.selectedCount,
+      //   this.selectedBefore,
+      //   this.selectedAfter
+      // )
       this.fetchChannelMembers();
     });
 
@@ -138,13 +138,28 @@ export class ChatChannelComponent implements OnInit {
             content: receivedMessage.content,
             senderId: receivedMessage.senderId,
           });
-          this.channelMessages.push(receivedMessage);
           this.changeDetector.detectChanges();
+          this.channelMessages.push(receivedMessage);
         }
       }
     });
 
-  }
+    this.signalrService
+    .receiveDeletedChannelMessage()
+    .subscribe((deletedMessageId: any) => {
+      // Handle the deleted message here
+      console.log(`Received deleted message with ID ${deletedMessageId}`);
+      this.changeDetector.detectChanges();
+    });
+
+    
+};
+      
+
+
+    
+
+  
 
   getchannelMessages(channelId: any) {
     this.ChannelService.getMessages(channelId).subscribe((res) => {
@@ -154,36 +169,36 @@ export class ChatChannelComponent implements OnInit {
     console.log(channelId);
   }
 
-  getMessages(
-    userId: string,
-    sort: string,
-    order: string,
-    count: number,
-    before: string,
-    after: string
-  ) {
+  // getMessages(
+  //   userId: string,
+  //   sort: string,
+  //   order: string,
+  //   count: number,
+  //   before: string,
+  //   after: string
+  // ) {
    
-    this.chatService
-      .getMessages(userId, sort, order, count, before, after)
-      .subscribe((res) => {
-        this.messages = res;
+  //   this.chatService
+  //     .getMessages(userId, sort, order, count, before, after)
+  //     .subscribe((res) => {
+  //       this.messages = res;
 
-        console.log('getMessages messages:', this.messages);
+  //       console.log('getMessages messages:', this.messages);
  
-      });
-  }
+  //     });
+  // }
 
 
   applyFilters(): void {
 
-    this.getMessages(
-      this.currentReceiverId,
-      this.selectedSort,
-      this.selectedOrder,
-      this.selectedCount,
-      this.selectedBefore,
-      this.selectedAfter
-    );
+    // this.getMessages(
+    //   this.currentReceiverId,
+    //   this.selectedSort,
+    //   this.selectedOrder,
+    //   this.selectedCount,
+    //   this.selectedBefore,
+    //   this.selectedAfter
+    // );
   }
 
   searchMessages(): void {
@@ -252,23 +267,24 @@ export class ChatChannelComponent implements OnInit {
     }
   }
 
-  onAcceptDelete(message: any) {
-    this.chatService.deleteMessage(message.id).subscribe(
-      () => {
-        const index = this.messages.findIndex((m) => m.id === message.id);
-        if (index !== -1) {
-          this.messages.splice(index, 1);
-        }
-
-        // Send a delete request using SignalR
-        this.signalrService.deleteMessage(message.id);
-      },
-      (error) => {
-        console.error('Error deleting message:', error);
-
+ onAcceptDelete(message: any) {
+  // Check if the sender is the current user
+  this.ChannelService.deleteMessage(this.currentReceiverId, message.id).subscribe(
+    () => {
+      // Remove the deleted message from the UI
+      const index = this.messages.findIndex((m) => m.id === message.id);
+      if (index !== -1) {
+        this.messages.splice(index, 1);
       }
-    );
-  }
+       
+      // Send a delete request using SignalR
+      this.signalrService.deleteChannelMessage(message.id);
+    },
+    (error) => {
+      console.error('Error deleting message:', error);
+    }
+  );
+}
 
   onDeclineDelete(message: any) {
     // Revert back to the original content and close the inline editor
@@ -276,32 +292,14 @@ export class ChatChannelComponent implements OnInit {
   }
 
 
-  // onDeleteMessage(message: any) {
-  //   if (message.senderId !== this.currentReceiverId) {
-  //     message.deleteMode = true;
-  //     message.showContextMenu = true;
-  //   }
-  // }
-
   onDeleteMessage(message: any) {
-  // Check if the sender is the current user
-  if (message.senderId === this.currentUserId) {
-    this.chatService.deleteMessage(message.id).subscribe(
-      () => {
-        const index = this.channelMessages.findIndex((m: any) => m.id === message.id);
-        if (index !== -1) {
-          this.channelMessages.splice(index, 1);
-        }
-
-        // Send a delete request using SignalR
-        this.signalrService.deleteMessage(message.id);
-      },
-      (error) => {
-        console.error('Error deleting message:', error);
-      }
-    );
+    if (message.senderId === this.currentUserId) {
+      message.deleteMode = true;
+      message.showContextMenu = true;
+    }
   }
-}
+
+ 
   toggleUserList() {
     this.showUserList = !this.showUserList;
 
@@ -351,16 +349,16 @@ export class ChatChannelComponent implements OnInit {
         console.log(response);
         if (response) {
           this.signalrService.sendChannelMessage(response);
-          this.messages.push(response); 
-          this.changeDetector.detectChanges();
-          //this.messages = response;
-          // this.messages.push({
-          //   id: response.id,
-          //   channelId: response.channelId,
-          //   content: response.content,
-          // });
+          // this.messages.push(response); 
+          // this.changeDetector.detectChanges();
+         
+          this.messages.push({
+            id: response.id,
+            channelId: response.channelId,
+            content: response.content,
+          });
           
-          //this.changeDetector.detectChanges();
+          this.changeDetector.detectChanges();
         } else {
       
           console.error('Error sending message:', response.error);
@@ -383,6 +381,36 @@ export class ChatChannelComponent implements OnInit {
     }
 
   }
+
+
+  deleteChannelMessage(message: any) {
+     
+    // Check if the sender is the current user
+    if (message.senderId === this.currentUserId) {
+
+       message.deleteMode = true;
+       message.showContextMenu = true;
+      // Call the service to delete the message
+      this.ChannelService.deleteMessage(this.currentReceiverId, message.id).subscribe(
+        () => {
+          // Remove the deleted message from the UI
+          const index = this.messages.findIndex((m) => m.id === message.id);
+          if (index !== -1) {
+            this.messages.splice(index, 1);
+          }
+          this.changeDetector.detectChanges();
+          // Send a delete request using SignalR
+          this.signalrService.deleteChannelMessage(message.id);
+        },
+        (error) => {
+          console.error('Error deleting message:', error);
+        }
+      );
+    }
+  }
+
+  
+
 }
 
 

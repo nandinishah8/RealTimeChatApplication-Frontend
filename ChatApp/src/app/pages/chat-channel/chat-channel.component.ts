@@ -275,8 +275,9 @@ export class ChatChannelComponent implements OnInit {
       const index = this.messages.findIndex((m) => m.id === message.id);
       if (index !== -1) {
         this.messages.splice(index, 1);
+        this.changeDetector.detectChanges();
       }
-       
+
       // Send a delete request using SignalR
       this.signalrService.deleteChannelMessage(message.id);
     },

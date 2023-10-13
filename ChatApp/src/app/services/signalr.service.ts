@@ -146,6 +146,24 @@ export class SignalrService {
     }
   }
 
+  EditChannelMessage(editMessage: any): void {
+    console.log("hio");
+    if (this.hubConnection.state === signalR.HubConnectionState.Connected) {
+      this.hubConnection
+        .invoke('EditChannelMessage', editMessage)
+        .then(() => {
+          console.log('Edited message sent successfully');
+        })
+        .catch((error) => {
+          console.error('Error sending edited message:', error);
+        });
+    } else {
+      console.warn('SignalR connection is not established yet.');
+    }
+  }
+
+  
+
   deleteChannelMessage(messageId: any): void {
   if (this.hubConnection.state === signalR.HubConnectionState.Connected) {
     this.hubConnection
@@ -167,13 +185,23 @@ export class SignalrService {
       subscriber.next(messageId);
     });
   });
-}
-
-  // Create a method to receive channel messages as an observable
-  receiveChannelMessages(): Observable<any> {
-    
-    return this.channelMessagesSubject.asObservable();
   }
+  
+  receiveEditedChannelMessage() {
+  return new Observable((subscriber) => {
+    this.hubConnection.on('ReceiveChannelEdited', (message: any) => {
+      subscriber.next(message);
+    });
+  });
+}
+  receiveChannelMessages() {
+    return new Observable((subscriber) => {
+      this.hubConnection.on('ReceiveChannelMessage', (message: any) => {
+      subscriber.next(message);
+    });
+  });
+}
+  
 
 
   public retrieveDeletedObject(): Subject<Message> {
@@ -188,7 +216,9 @@ export class SignalrService {
     return this.sharedEditedObj;
   }
 
- 
+ public retrieveChannelEditedObject(): Subject<EditMessageDto> {
+    return this.sharedEditedObj;
+  }
 }
 
 

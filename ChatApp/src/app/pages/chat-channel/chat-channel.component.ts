@@ -62,14 +62,7 @@ export class ChatChannelComponent implements OnInit {
       this.getchannelMessages(channelId);
       this.decode_token();
 
-      // this.getMessages(
-      //   this.currentReceiverId,
-      //   this.selectedSort,
-      //   this.selectedOrder,
-      //   this.selectedCount,
-      //   this.selectedBefore,
-      //   this.selectedAfter
-      // )
+      
       this.fetchChannelMembers();
     });
 
@@ -111,7 +104,16 @@ export class ChatChannelComponent implements OnInit {
       }
     });
 
+ this.signalrService.receiveEditedChannelMessage().subscribe((receivedEditedMessage: any) => {
+      console.log('Received edited message:', receivedEditedMessage);
 
+
+      const editedMessageIndex = this.messages.findIndex((m) => m.id === receivedEditedMessage.id);
+      if (editedMessageIndex !== -1) {
+        this.messages[editedMessageIndex].content = receivedEditedMessage.content;
+        this.changeDetector.detectChanges();
+      }
+    });
     this.signalrService.retrieveDeletedObject().subscribe((deletedMessageId: any) => {
       const index = this.messages.findIndex((message) => message.id === deletedMessageId);
       if (index !== -1) {
@@ -125,42 +127,30 @@ export class ChatChannelComponent implements OnInit {
     }
 
     this.signalrService.receiveChannelMessages().subscribe((receivedMessage: any) => {
-      console.log('Received channel message:', receivedMessage);
 
-  
-      if (receivedMessage.channelId === this.currentReceiverId) {
-  
-        if (receivedMessage.senderId !== this.currentUserId) {
-      
-          this.messages.push({
+      console.log('Received channel message:', receivedMessage);
+ this.messages.push({
             id: receivedMessage.id,
             channelId: receivedMessage.channelId,
             content: receivedMessage.content,
             senderId: receivedMessage.senderId,
           });
-          this.changeDetector.detectChanges();
+    this.changeDetector.detectChanges();
           this.channelMessages.push(receivedMessage);
-        }
-      }
+
     });
 
-    this.signalrService
-    .receiveDeletedChannelMessage()
-    .subscribe((deletedMessageId: any) => {
-      // Handle the deleted message here
-      console.log(`Received deleted message with ID ${deletedMessageId}`);
-      this.changeDetector.detectChanges();
-    });
+    this.signalrService.receiveDeletedChannelMessage().subscribe((deletedMessageId: any) => {
+      this.getchannelMessages(this.currentReceiverId);
+     
+  // Handle the deleted message here
+  console.log(`Received deleted message with ID ${deletedMessageId}`);
+  this.changeDetector.detectChanges(); 
+});
 
     
 };
       
-
-
-    
-
-  
-
   getchannelMessages(channelId: any) {
     this.ChannelService.getMessages(channelId).subscribe((res) => {
       console.log(res);
@@ -169,37 +159,9 @@ export class ChatChannelComponent implements OnInit {
     console.log(channelId);
   }
 
-  // getMessages(
-  //   userId: string,
-  //   sort: string,
-  //   order: string,
-  //   count: number,
-  //   before: string,
-  //   after: string
-  // ) {
-   
-  //   this.chatService
-  //     .getMessages(userId, sort, order, count, before, after)
-  //     .subscribe((res) => {
-  //       this.messages = res;
-
-  //       console.log('getMessages messages:', this.messages);
  
-  //     });
-  // }
 
-
-  applyFilters(): void {
-
-    // this.getMessages(
-    //   this.currentReceiverId,
-    //   this.selectedSort,
-    //   this.selectedOrder,
-    //   this.selectedCount,
-    //   this.selectedBefore,
-    //   this.selectedAfter
-    // );
-  }
+  
 
   searchMessages(): void {
     if (this.searchQuery.trim() === '') {
@@ -230,13 +192,11 @@ export class ChatChannelComponent implements OnInit {
     message.editMode = false;
     console.log(message);
 
-    this.chatService.editMessage(message.id, message.content).subscribe(
+    this.ChannelService.EditChannelMessage(message.id, message.content).subscribe(
       (res) => {
-        const editedMessageIndex = this.messages.findIndex(
-          (m) => m.id === message.id
-        );
-        if (editedMessageIndex !== -1) {
-          this.messages[editedMessageIndex].content = message.editedContent;
+      console.log(res);
+      
+      
 
           // Create an editMessage object with the edited content
           const editMessage = new EditMessageDto(message.id, message.editedContent);
@@ -244,7 +204,7 @@ export class ChatChannelComponent implements OnInit {
 
           // Send the edited message through SignalR
           this.signalrService.EditMessage(editMessage);
-        }
+       // }
       },
       (error) => {
         console.error('Error editing message:', error);
@@ -271,14 +231,17 @@ export class ChatChannelComponent implements OnInit {
   // Check if the sender is the current user
   this.ChannelService.deleteMessage(this.currentReceiverId, message.id).subscribe(
     () => {
-      // Remove the deleted message from the UI
+      
+      message.deleteMode = false;
+    
+      this.getchannelMessages(this.currentReceiverId);
+      this.changeDetector.detectChanges();
       const index = this.messages.findIndex((m) => m.id === message.id);
       if (index !== -1) {
         this.messages.splice(index, 1);
-        this.changeDetector.detectChanges();
       }
-
-      // Send a delete request using SignalR
+      
+      
       this.signalrService.deleteChannelMessage(message.id);
     },
     (error) => {
@@ -288,7 +251,7 @@ export class ChatChannelComponent implements OnInit {
 }
 
   onDeclineDelete(message: any) {
-    // Revert back to the original content and close the inline editor
+   
     message.deleteMode = false;
   }
 
@@ -328,7 +291,7 @@ export class ChatChannelComponent implements OnInit {
       (response) => {
         console.log("Members deleted from the channel successfully.");
    
-        //  this.removeDeletedMembersFromList(memberIds);
+       
         this.fetchChannelMembers();
       },
       (error) => {
@@ -350,15 +313,15 @@ export class ChatChannelComponent implements OnInit {
         console.log(response);
         if (response) {
           this.signalrService.sendChannelMessage(response);
-          // this.messages.push(response); 
-          // this.changeDetector.detectChanges();
+         
          
           this.messages.push({
             id: response.id,
             channelId: response.channelId,
             content: response.content,
           });
-          
+         
+          this.getchannelMessages(this.currentReceiverId);
           this.changeDetector.detectChanges();
         } else {
       

@@ -270,7 +270,7 @@ export class ConversationComponent implements OnInit {
 
 
   onDeleteMessage(message: any) {
-    if (message.senderId !== this.currentReceiverId) {
+    if (message.senderId === this.currentReceiverId) {
       message.deleteMode = true;
       message.showContextMenu = true;
     }

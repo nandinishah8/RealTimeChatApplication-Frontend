@@ -44,7 +44,7 @@ export class ChatComponent implements OnInit {
   
 
   constructor(private userService: UserService, private router: Router, private ChatService: ChatService, private SignalrService: SignalrService, private ChannelService: ChannelService, private formBuilder: FormBuilder) {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('auth_token');
     console.log('JWT Token:', token);
 
     if (token) {

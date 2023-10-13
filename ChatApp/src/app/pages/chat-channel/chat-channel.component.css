@@ -122,6 +122,7 @@ strong {
     background-color: burlywood;
     color: black;
     padding: 8px;
+    margin-bottom: 5px;
     align-self: flex-start;
     max-width: fit-content;
     margin-right: auto;
@@ -146,29 +147,6 @@ strong {
     border-radius: 5px;
 }
 
-/* .outgoing {
-    background-color: #047BD5;
-    color: #fff;
-    align-self: flex-end;
-    flex-direction: column;
-    max-width: fit-content;
-    margin-left: auto;
-    margin-bottom: 5px;
-    padding: 8px;
-    border-radius: 8px;
-    cursor: pointer;
-    display: flex;
-
-} */
-
-/* .incoming {
-    background-color: #f1f1f1;
-    color: #333;
-    padding: 8px;
-    align-self: flex-start;
-    max-width: fit-content;
-    margin-right: auto;
-} */
 
 /* Styles for editor actions */
 .editor-actions {
@@ -213,7 +191,7 @@ strong {
 
 /* Styles for the chat input */
 .chat-input {
-    margin-top: 0px;
+    margin-top: -10px;
     display: flex;
     align-items: center;
 }

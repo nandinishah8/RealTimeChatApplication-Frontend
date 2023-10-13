@@ -94,12 +94,12 @@ export class ChatChannelComponent implements OnInit {
 
 
     this.signalrService.retrieveEditedObject().subscribe((receivedEditedMessage: EditMessageDto) => {
-      console.log('Received edited message:', receivedEditedMessage);
+      console.log('Received edited message:', receivedEditedMessage,this.channelMessages);
 
 
-      const editedMessageIndex = this.messages.findIndex((m) => m.id === receivedEditedMessage.id);
+      const editedMessageIndex = this.channelMessages.findIndex((m:any) => m.id === receivedEditedMessage.id);
       if (editedMessageIndex !== -1) {
-        this.messages[editedMessageIndex].content = receivedEditedMessage.content;
+        this.channelMessages[editedMessageIndex].content = receivedEditedMessage.content;
         this.changeDetector.detectChanges();
       }
     });
@@ -108,9 +108,9 @@ export class ChatChannelComponent implements OnInit {
       console.log('Received edited message:', receivedEditedMessage);
 
 
-      const editedMessageIndex = this.messages.findIndex((m) => m.id === receivedEditedMessage.id);
+      const editedMessageIndex = this.channelMessages.findIndex((m:any) => m.id === receivedEditedMessage.id);
       if (editedMessageIndex !== -1) {
-        this.messages[editedMessageIndex].content = receivedEditedMessage.content;
+        this.channelMessages[editedMessageIndex].content = receivedEditedMessage.content;
         this.changeDetector.detectChanges();
       }
     });

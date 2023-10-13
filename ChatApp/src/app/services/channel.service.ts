@@ -3,12 +3,13 @@ import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { ChatService } from 'src/app/services/chat.service';
 import { SignalrService } from './signalr.service';
+import { UserService } from './user.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ChannelService {
-   constructor(private http: HttpClient, private SignalrService: SignalrService) { }
+   constructor(private http: HttpClient, private SignalrService: SignalrService, private UserService: UserService) { }
   url = 'http://localhost:5243/api';
    
   getChannels(): Observable<any[]> {
@@ -113,14 +114,43 @@ export class ChannelService {
     return this.http.post<any>(`http://localhost:5243/api/Messages/Channels/messages`, body, { headers: headers });
   }
 
-  // Extend your code to receive messages from SignalR
-  // receiveChannelMessages(channelId:any): Observable<any> {
-  //   return this.SignalrService.receiveChannelMessages();
-  // }
+  //Extend your code to receive messages from SignalR
+  receiveChannelMessages(channelId:any): Observable<any> {
+    return this.SignalrService.receiveChannelMessages();
+  }
 
   getMessages(channelId: any) {
     return this.http.get<any>(`http://localhost:5243/api/Messages/${channelId}/messages`, channelId);
   }
+
+  EditChannelMessage(messageId: number, content: string) {
+    const token = localStorage.getItem('auth_token');
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`
+    });
+   
+
+    return this.http.put<any>(
+      `http://localhost:5243/api/Messages/(channelid)?id=${messageId}`,
+      { id: messageId,content:content }, {headers:headers}
+    );
+  }
+     
+  
+
+    deleteMessage(channelId: any, messageId: any): Observable<any> {
+    const token = localStorage.getItem('auth_token');
+      const headers = new HttpHeaders({
+       'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    });
+
+    return this.http.delete(`http://localhost:5243/api/Messages/channelMessage?id=${channelId}&channelId=${messageId}`, { headers });
+  }
+
+
+
 
 }
 

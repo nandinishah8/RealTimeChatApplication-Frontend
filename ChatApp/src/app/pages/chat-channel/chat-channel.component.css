@@ -81,6 +81,54 @@ strong {
     padding: 10px;
 }
 
+.group.sent {
+    background-color: #007BFF;
+    color: #fff;
+    align-self: flex-end;
+}
+
+.group .timestamp {
+    font-size: 12px;
+    color: #999;
+}
+
+.group.sent .message-content p:first-child {
+    font-weight: bold;
+    margin-right: 10px;
+}
+
+/* Style for sender's message content */
+.group.sent .message-content p:last-child {
+    font-weight: normal;
+}
+
+/* Sender message style */
+.sender-message {
+    background-color: #047BD5;
+    color: #fff;
+    align-self: flex-end;
+    flex-direction: column;
+    max-width: fit-content;
+    margin-left: auto;
+    margin-bottom: 5px;
+    padding: 8px;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+}
+
+/* Receiver message style */
+.receiver-message {
+    background-color: burlywood;
+    color: black;
+    padding: 8px;
+    margin-bottom: 5px;
+    align-self: flex-start;
+    max-width: fit-content;
+    margin-right: auto;
+    border-radius: 8px;
+}
+
 
 
 /* Chat messages container */
@@ -99,29 +147,6 @@ strong {
     border-radius: 5px;
 }
 
-.outgoing {
-    background-color: #047BD5;
-    color: #fff;
-    align-self: flex-end;
-    flex-direction: column;
-    max-width: fit-content;
-    margin-left: auto;
-    margin-bottom: 5px;
-    padding: 8px;
-    border-radius: 8px;
-    cursor: pointer;
-    display: flex;
-
-}
-
-.incoming {
-    background-color: #f1f1f1;
-    color: #333;
-    padding: 8px;
-    align-self: flex-start;
-    max-width: fit-content;
-    margin-right: auto;
-}
 
 /* Styles for editor actions */
 .editor-actions {
@@ -166,7 +191,7 @@ strong {
 
 /* Styles for the chat input */
 .chat-input {
-    margin-top: 0px;
+    margin-top: -10px;
     display: flex;
     align-items: center;
 }
@@ -215,6 +240,14 @@ input[type="text"] {
 
 .message-filters button {
     background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    padding: 5px 10px;
+    cursor: pointer;
+}
+
+.group {
     color: #fff;
     border: none;
     border-radius: 4px;

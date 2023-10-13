@@ -78,22 +78,22 @@
                     <label for="after">After:</label>
                     <input type="datetime-local" [(ngModel)]="selectedAfter" name="after" />
 
-                    <button (click)="applyFilters()">Apply Filters</button>
+
                 </div>
 
             </nav>
             <div class="chat-container">
 
                 <div class="chat-messages" style="height: 492px;">
-                    <div [ngClass]="{'chat-message outgoing': message?.senderId === currentUserId, 'chat-message incoming': message?.senderId !== currentUserId}"
+                    <div [ngClass]="{'sender-message': message.senderId === currentUserId, 'receiver-message': message.senderId !== currentUserId}"
                         *ngFor="let message of channelMessages" (contextmenu)="onContextMenu($event, message)">
-                        <span class="message-content" *ngIf="!message.editMode && !message.deleteMode">
-                            <p>{{ message.senderName }} </p>
-                            <p>{{message.content}} </p>
+                        <span class="group" *ngIf="!message.editMode && !message.deleteMode">
+                            <p>{{ message.senderName }}</p>
+                            <p>{{ message.content }}</p>
                             <p>{{ message.timestamp | date }}</p>
-
                         </span>
-                        <div *ngIf="message.isEvent && !message.editMode && !message.deleteMode" class="editor-actions">
+                        <div *ngIf="message.isEvent && !message.editMode && !message.deleteMode && message.senderId === currentUserId"
+                            class="editor-actions">
                             <button class="edit-button" (click)="onEditMessage(message)">
                                 <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
                             </button>

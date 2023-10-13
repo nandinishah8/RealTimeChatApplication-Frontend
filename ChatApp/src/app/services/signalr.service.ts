@@ -66,6 +66,7 @@ export class SignalrService {
       this.channelMessagesSubject.next(message);
     });
   
+    
 
    
     this.startConnection();
@@ -145,11 +146,62 @@ export class SignalrService {
     }
   }
 
-  // Create a method to receive channel messages as an observable
-  receiveChannelMessages(): Observable<any> {
-    
-    return this.channelMessagesSubject.asObservable();
+  EditChannelMessage(editMessage: any): void {
+    console.log("hio");
+    if (this.hubConnection.state === signalR.HubConnectionState.Connected) {
+      this.hubConnection
+        .invoke('EditChannelMessage', editMessage)
+        .then(() => {
+          console.log('Edited message sent successfully');
+        })
+        .catch((error) => {
+          console.error('Error sending edited message:', error);
+        });
+    } else {
+      console.warn('SignalR connection is not established yet.');
+    }
   }
+
+  
+
+  deleteChannelMessage(messageId: any): void {
+  if (this.hubConnection.state === signalR.HubConnectionState.Connected) {
+    this.hubConnection
+      .invoke('DeleteChannelMessage', messageId)
+      .then(() => {
+        console.log('Deleted channel message sent successfully');
+      })
+      .catch((error) => {
+        console.error('Error sending deleted channel message:', error);
+      });
+  } else {
+    console.warn('SignalR connection is not established yet.');
+  }
+  }
+  
+  receiveDeletedChannelMessage() {
+  return new Observable((subscriber) => {
+    this.hubConnection.on('ReceiveDeletedChannelMessage', (messageId: any) => {
+      subscriber.next(messageId);
+    });
+  });
+  }
+  
+  receiveEditedChannelMessage() {
+  return new Observable((subscriber) => {
+    this.hubConnection.on('ReceiveChannelEdited', (message: any) => {
+      subscriber.next(message);
+    });
+  });
+}
+  receiveChannelMessages() {
+    return new Observable((subscriber) => {
+      this.hubConnection.on('ReceiveChannelMessage', (message: any) => {
+      subscriber.next(message);
+    });
+  });
+}
+  
 
 
   public retrieveDeletedObject(): Subject<Message> {
@@ -164,7 +216,9 @@ export class SignalrService {
     return this.sharedEditedObj;
   }
 
- 
+ public retrieveChannelEditedObject(): Subject<EditMessageDto> {
+    return this.sharedEditedObj;
+  }
 }
 
 

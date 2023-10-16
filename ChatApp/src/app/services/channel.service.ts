@@ -53,7 +53,7 @@ export class ChannelService {
   return this.http.get<any[]>(`http://localhost:5243/api/Channels/members/${channelId}`);
   }
   
-    updateChannel(channelId: any, name: string, description: string): Observable<any> {
+  updateChannel(channelId: any, name: string, description: string): Observable<any> {
     const token = localStorage.getItem('auth_token');
     if (!token) {
       throw new Error('JWT token not found.');

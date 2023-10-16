@@ -29,7 +29,7 @@ export class ChatComponent implements OnInit {
   currentUserId: string = '';
   channels: any[] = [];
   showModal: boolean = false;
-  showAddMembersModal: boolean = false; // For showing and hiding the modal
+  showAddMembersModal: boolean = false; 
   newChannelName: string = '';
   newChannelDescription: string = '';
   selectedUsers: string[] = [];
@@ -80,7 +80,7 @@ export class ChatComponent implements OnInit {
        
       }),
 
-      // Subscribe to updates for each user's unread message count
+     
       this.users.forEach((user) => {
          
         this.showMessage(user.id);
@@ -92,7 +92,7 @@ export class ChatComponent implements OnInit {
   }
 
   loadChannels() {
-    // Fetch the list of channels based on the user's ID
+   
     const userId = this.currentUserId;
     this.ChannelService.getChannels().subscribe(
       (res) => {
@@ -159,17 +159,17 @@ export class ChatComponent implements OnInit {
     const channelDescription = this.newChannelDescription;
     const currentUserId = this.currentUserId;
 
-    // Create a new channel object
+   
     const newChannel = {
       name: channelName,
       description: channelDescription,
       members: [this.currentUserId, ...this.selectedUsers], 
     };
 
-    // Send a request to create the channel
+    
     this.ChannelService.createChannel(newChannel).subscribe(
       (response) => {
-        // Handle the success response from the server
+       
         console.log('Channel created successfully:', response);
 
       
@@ -181,7 +181,7 @@ export class ChatComponent implements OnInit {
         this.loadChannels();
       },
       (error) => {
-        // Handle any errors from the server
+        
         console.error('Error creating channel:', error);
       }
     );
@@ -203,14 +203,14 @@ export class ChatComponent implements OnInit {
       return;
     }
 
-    // Call the channel service to add members to the selected channel
+    
     this.ChannelService.addMembersToChannel(this.selectedChannel, this.selectedUsers).subscribe(
       (result) => {
-        // Members added to the channel successfully
+      
        
         console.log('Members added to the channel:', result);
 
-        // Clear the selected users and channel after adding them to the channel
+      
         this.selectedUsers = [];
         this.selectedChannel = null;
 

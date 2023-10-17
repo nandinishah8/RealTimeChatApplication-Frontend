@@ -104,7 +104,7 @@ export class ChatChannelComponent implements OnInit {
       }
     });
 
- this.signalrService.receiveEditedChannelMessage().subscribe((receivedEditedMessage: any) => {
+    this.signalrService.receiveEditedChannelMessage().subscribe((receivedEditedMessage: any) => {
       console.log('Received edited message:', receivedEditedMessage);
 
 
@@ -114,6 +114,8 @@ export class ChatChannelComponent implements OnInit {
         this.changeDetector.detectChanges();
       }
     });
+
+
     this.signalrService.retrieveDeletedObject().subscribe((deletedMessageId: any) => {
       const index = this.messages.findIndex((message) => message.id === deletedMessageId);
       if (index !== -1) {
@@ -129,24 +131,23 @@ export class ChatChannelComponent implements OnInit {
     this.signalrService.receiveChannelMessages().subscribe((receivedMessage: any) => {
 
       console.log('Received channel message:', receivedMessage);
- this.messages.push({
+      this.messages.push({
             id: receivedMessage.id,
             channelId: receivedMessage.channelId,
             content: receivedMessage.content,
             senderId: receivedMessage.senderId,
           });
-    this.changeDetector.detectChanges();
+          this.changeDetector.detectChanges();
           this.channelMessages.push(receivedMessage);
 
     });
 
+    
     this.signalrService.receiveDeletedChannelMessage().subscribe((deletedMessageId: any) => {
       this.getchannelMessages(this.currentReceiverId);
-     
- 
-  console.log(`Received deleted message with ID ${deletedMessageId}`);
-  this.changeDetector.detectChanges(); 
-});
+      console.log(`Received deleted message with ID ${deletedMessageId}`);
+      this.changeDetector.detectChanges(); 
+    });
 
     
 };

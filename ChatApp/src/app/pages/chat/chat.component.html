@@ -110,11 +110,12 @@
                                                 <i class="fa fa-trash-o" aria-hidden="true"></i>
                                             </button>
                                         </div>
-                                        <div *ngIf="channel.editMode">
+                                        <div *ngIf="showEditModal" class="modal">
 
-                                            <input type="text" [(ngModel)]="channel.name" />
-                                            <input type="text" [(ngModel)]="channel.description" />
-                                            <button (click)="saveEditedChannel(channel)">Save</button>
+                                            <input [(ngModel)]="selectedChannel.name" placeholder="Name" />
+                                            <input [(ngModel)]="selectedChannel.description"
+                                                placeholder="Description" />
+                                            <button (click)="submitEditChannel(channel)">Save</button>
                                         </div>
 
                                     </div>

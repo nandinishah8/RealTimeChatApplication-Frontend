@@ -235,9 +235,11 @@ export class ChatComponent implements OnInit {
       description: channel.description,
     });
 
+    this.selectedChannel = channel;
     this.showEditModal = true;
-     channel.editMode = true;
+    channel.editMode = true;
   }
+
 
  
   deleteChannel(channelId: number) {
@@ -258,31 +260,28 @@ export class ChatComponent implements OnInit {
     );
   }
 
- 
-
-saveEditedChannel(channel: any) {
   
-  channel.editMode = false;
-}
-
-  submitEditChannel(channel: any) {
-    if (this.channelEditForm.valid) {
-      const { name, description } = this.channelEditForm.value;
+  submitEditChannel(channel : any) {
+  if (this.selectedChannel) {
+    const { name, description } = this.selectedChannel;
     
-      this.ChannelService.updateChannel(channel.channelId, name, description).subscribe(
-        (response) => {
-          
-          console.log('Channel updated successfully:', response);
-          this.showEditModal = false; 
-          this.loadChannels();
-        },
-        (error) => {
-          
-          console.error('Error updating channel:', error);
-        }
-      );
-    }
+    this.ChannelService.updateChannel(
+      this.selectedChannel.channelId,
+      name,
+      description
+    ).subscribe(
+      (response) => {
+        // Refresh the list of channels
+        this.loadChannels();
+        console.log('Channel updated successfully:', response);
+        this.showEditModal = false;
+      },
+      (error) => {
+        console.error('Error updating channel:', error);
+      }
+    );
   }
+}
 
   
 }

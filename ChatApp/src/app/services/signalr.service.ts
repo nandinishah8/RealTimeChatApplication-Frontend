@@ -20,6 +20,8 @@ export class SignalrService {
   private sharedEditedObj = new Subject<EditMessageDto>();
   private sharedDeletedObj = new Subject<Message>();
   private channelMessagesSubject = new Subject<any>();
+  private newChannelSubject = new Subject<any>();
+  private updatedChannelSubject: Subject<any> = new Subject<any>();
   changeDetector: any;
   
  
@@ -43,7 +45,12 @@ export class SignalrService {
         };
         
       this.sharedObj.next(receivedMessageObject);
+      });
+    
+     this.hubConnection.on('ReceiveChannel', (newChannel: any) => {
+      this.newChannelSubject.next(newChannel);
     });
+  
 
    
 
@@ -64,6 +71,11 @@ export class SignalrService {
 
      this.hubConnection.on('ReceiveChannelMessage', (message) => {
       this.channelMessagesSubject.next(message);
+     });
+    
+     this.hubConnection.on('ReceiveUpdatedChannel', (updatedChannel: any) => {
+      // Notify subscribers about the updated channel
+      this.updatedChannelSubject.next(updatedChannel);
     });
   
     
@@ -132,6 +144,39 @@ export class SignalrService {
     }
   }
 
+
+   createChannel(channel: any) {
+    if (this.hubConnection.state === signalR.HubConnectionState.Connected) {
+      this.hubConnection
+        .invoke('CreateChannel', channel)
+        .then(() => {
+          console.log('Channel created successfully');
+        })
+        .catch((error) => {
+          console.error('Error creating channel:', error);
+        });
+    } else {
+      console.warn('SignalR connection is not established yet.');
+    }
+  }
+
+   editChannel(channelId: number, updatedChannel: any) {
+    if (this.hubConnection.state === signalR.HubConnectionState.Connected) {
+      this.hubConnection
+        .invoke('EditChannel', channelId, updatedChannel)
+        .then(() => {
+          console.log('EditChannel request sent successfully');
+        })
+        .catch((error) => {
+          console.error('Error sending EditChannel request:', error);
+        });
+    } else {
+      console.warn('SignalR connection is not established yet.');
+    }
+  }
+
+  
+
   sendChannelMessage(message: any) {
       if (this.hubConnection.state === signalR.HubConnectionState.Connected) {
         this.hubConnection.invoke('SendChannelMessage', message)
@@ -199,7 +244,9 @@ export class SignalrService {
       this.hubConnection.on('ReceiveChannelMessage', (message: any) => {
       subscriber.next(message);
     });
-  });
+    });
+    
+    
 }
   
 
@@ -218,6 +265,14 @@ export class SignalrService {
 
  public retrieveChannelEditedObject(): Subject<EditMessageDto> {
     return this.sharedEditedObj;
+  }
+
+  public getNewChannelsObservable(): Observable<any> {
+    return this.newChannelSubject.asObservable();
+  }
+
+  public  receiveUpdatedChannel() {
+    return this.updatedChannelSubject.asObservable();
   }
 }
 

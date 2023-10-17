@@ -63,6 +63,28 @@ export class ChatComponent implements OnInit {
       name: [''],
       description: [''],
     });
+
+      this.SignalrService.getNewChannelsObservable().subscribe((newChannel) => {
+      console.log('New channel received:', newChannel);
+        // Add the new channel to your channels list
+        this.loadChannels();
+      // Update your UI to display the new channel
+      });
+    
+    this.SignalrService.receiveUpdatedChannel().subscribe((updatedChannel: any) => {
+      // Handle the updated channel data here
+      console.log('Received updated channel:', updatedChannel);
+
+      
+      this.loadChannels();
+      
+      const index = this.channels.findIndex((channel) => channel.id === updatedChannel.id);
+      if (index !== -1) {
+        this.channels[index] = updatedChannel;
+      }
+    });
+  
+  
   }
 
   

@@ -63,7 +63,7 @@ export class ChatService {
       .pipe(
         map((response: any) => {
           console.log('getMessages response:', response);
-          // Mark incoming messages as seen
+        
           const messages = response.messages.map((message: any) => {
           
             return message;

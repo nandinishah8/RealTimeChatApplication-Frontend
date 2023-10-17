@@ -154,7 +154,7 @@ export class ConversationComponent implements OnInit {
 
   searchMessages(): void {
     if (this.searchQuery.trim() === '') {
-      // Don't search with an empty query
+     
       return;
     }
 
@@ -166,7 +166,7 @@ export class ConversationComponent implements OnInit {
 
   sendMessage() {
     if (this.messageContent.trim() === '') {
-      // Don't send an empty message
+     
       return;
     }
 
@@ -177,7 +177,7 @@ export class ConversationComponent implements OnInit {
         (response) => {
           this.messageContent = '';
           console.log(response);
-          // Handle the response from the backend if needed
+         
           const message = {
             id: response.id,
             receiverId: response.receiverId,
@@ -203,7 +203,7 @@ export class ConversationComponent implements OnInit {
 
 
   onAcceptEdit(message: any) {
-    // Update the message content with edited content
+  
     message.content = message.editedContent;
     message.editMode = false;
     console.log(message);
@@ -216,11 +216,11 @@ export class ConversationComponent implements OnInit {
         if (editedMessageIndex !== -1) {
           this.messages[editedMessageIndex].content = message.editedContent;
 
-          // Create an editMessage object with the edited content
+          
           const editMessage = new EditMessageDto(message.id, message.editedContent);
           console.log(editMessage);
 
-          // Send the edited message through SignalR
+         
           this.signalrService.EditMessage(editMessage);
         }
       },
@@ -233,7 +233,7 @@ export class ConversationComponent implements OnInit {
 
 
   onDeclineEdit(message: any) {
-    // Revert back to original content and close the inline editor
+   
     message.editMode = false;
   }
 
@@ -253,7 +253,7 @@ export class ConversationComponent implements OnInit {
           this.messages.splice(index, 1); 
         }
 
-        // Send a delete request using SignalR
+        
         this.signalrService.deleteMessage(message.id);
       },
       (error) => {
@@ -264,7 +264,7 @@ export class ConversationComponent implements OnInit {
   }
 
   onDeclineDelete(message: any) {
-    // Revert back to the original content and close the inline editor
+  
     message.deleteMode = false;
   }
 

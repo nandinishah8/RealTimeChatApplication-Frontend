@@ -191,13 +191,13 @@ export class ChatComponent implements OnInit {
 
 
   addMembersToChannel() {
-    // Ensure a channel is selected
+    
     if (!this.selectedChannel) {
       console.error('No channel selected to add members to.');
       return;
     }
 
-    // Ensure there are selected users to add
+    
     if (this.selectedUsers.length === 0) {
       console.error('No users selected to add to the channel.');
       return;
@@ -252,7 +252,7 @@ export class ChatComponent implements OnInit {
         this.channels = this.channels.filter((channel) => channel.channelId !== channelId);
       },
       (error) => {
-        // Handle error
+      
         console.error('Error deleting channel:', error);
       }
     );

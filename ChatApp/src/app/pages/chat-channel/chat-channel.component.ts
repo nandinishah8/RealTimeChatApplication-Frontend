@@ -143,7 +143,7 @@ export class ChatChannelComponent implements OnInit {
     this.signalrService.receiveDeletedChannelMessage().subscribe((deletedMessageId: any) => {
       this.getchannelMessages(this.currentReceiverId);
      
-  // Handle the deleted message here
+ 
   console.log(`Received deleted message with ID ${deletedMessageId}`);
   this.changeDetector.detectChanges(); 
 });
@@ -165,7 +165,7 @@ export class ChatChannelComponent implements OnInit {
 
   searchMessages(): void {
     if (this.searchQuery.trim() === '') {
-      // Don't search with an empty query
+    
       return;
     }
 
@@ -198,13 +198,13 @@ export class ChatChannelComponent implements OnInit {
       
       
 
-          // Create an editMessage object with the edited content
+        
           const editMessage = new EditMessageDto(message.id, message.editedContent);
           console.log(editMessage);
 
-          // Send the edited message through SignalR
+          
           this.signalrService.EditMessage(editMessage);
-       // }
+       
       },
       (error) => {
         console.error('Error editing message:', error);
@@ -215,7 +215,7 @@ export class ChatChannelComponent implements OnInit {
 
 
   onDeclineEdit(message: any) {
-    // Revert back to original content and close the inline editor
+  
     message.editMode = false;
   }
 
@@ -228,7 +228,7 @@ export class ChatChannelComponent implements OnInit {
   }
 
  onAcceptDelete(message: any) {
-  // Check if the sender is the current user
+  
   this.ChannelService.deleteMessage(this.currentReceiverId, message.id).subscribe(
     () => {
       
@@ -268,7 +268,7 @@ export class ChatChannelComponent implements OnInit {
     this.showUserList = !this.showUserList;
 
     if (this.showUserList) {
-      // Fetch and display members when user list is opened
+     
       this.fetchChannelMembers();
     }
   }
@@ -303,7 +303,7 @@ export class ChatChannelComponent implements OnInit {
   
   sendMessageToChannel() {
     if (this.messageContent.trim() === '') {
-      // Don't send an empty message
+    
       return;
     }
 
@@ -349,21 +349,21 @@ export class ChatChannelComponent implements OnInit {
 
   deleteChannelMessage(message: any) {
      
-    // Check if the sender is the current user
+   
     if (message.senderId === this.currentUserId) {
 
        message.deleteMode = true;
        message.showContextMenu = true;
-      // Call the service to delete the message
+     
       this.ChannelService.deleteMessage(this.currentReceiverId, message.id).subscribe(
         () => {
-          // Remove the deleted message from the UI
+         
           const index = this.messages.findIndex((m) => m.id === message.id);
           if (index !== -1) {
             this.messages.splice(index, 1);
           }
           this.changeDetector.detectChanges();
-          // Send a delete request using SignalR
+          
           this.signalrService.deleteChannelMessage(message.id);
         },
         (error) => {

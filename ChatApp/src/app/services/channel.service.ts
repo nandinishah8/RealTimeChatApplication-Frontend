@@ -114,7 +114,7 @@ export class ChannelService {
     return this.http.post<any>(`http://localhost:5243/api/Messages/Channels/messages`, body, { headers: headers });
   }
 
-  //Extend your code to receive messages from SignalR
+ 
   receiveChannelMessages(channelId:any): Observable<any> {
     return this.SignalrService.receiveChannelMessages();
   }

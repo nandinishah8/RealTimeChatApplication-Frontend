@@ -78,7 +78,7 @@ export class ChatComponent implements OnInit {
   console.log('Received updated channel:', updatedChannel);
      const index = this.channels.findIndex((channel) => channel.channelId === updatedChannel.channelId);
      
-  
+   
 
   if (index !== -1) {
     this.channels[index] = updatedChannel;
@@ -89,7 +89,19 @@ export class ChatComponent implements OnInit {
 
  
   this.cdr.detectChanges();
-});
+   });
+    
+    this.SignalrService.receiveDeletedChannel().subscribe((channelId: any) => {
+ 
+      console.log('Received deleted channel:', channelId);
+      const index = this.channels.findIndex((channel) => channel.channelId === channelId);
+      if (index !== -1) {
+         
+        this.channels.splice(index, 1);
+  }
+
+    }
+    );
   
   
   }
@@ -281,7 +293,10 @@ export class ChatComponent implements OnInit {
         console.log('Channel deleted successfully:', response);
 
        
+        this.SignalrService.deleteChannel(channelId);
         this.channels = this.channels.filter((channel) => channel.channelId !== channelId);
+        console.log(channelId);
+        this.cdr.detectChanges();
       },
       (error) => {
       

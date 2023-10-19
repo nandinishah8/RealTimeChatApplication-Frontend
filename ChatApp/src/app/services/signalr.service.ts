@@ -175,6 +175,20 @@ export class SignalrService {
     }
   }
 
+  deleteChannel(channelId: any) {
+    if (this.hubConnection.state === signalR.HubConnectionState.Connected) {
+      this.hubConnection
+        .invoke('DeleteChannel', channelId)
+        .then(() => {
+          console.log('DeleteChannel request sent successfully',channelId);
+        })
+        .catch((error) => {
+          console.error('Error sending DeleteChannel request:', error);
+        });
+    } else {
+      console.warn('SignalR connection is not established yet.');
+    }
+  }
   
 
   sendChannelMessage(message: any) {
@@ -256,6 +270,17 @@ export class SignalrService {
         console.log(channelId);
         const msg = { channelId: channelId, name: message.name, description: message.description, createdAt: message.createdAt }
         subscriber.next(msg);
+      });
+    });
+  }
+
+  receiveDeletedChannel() {
+    return new Observable((subscriber) => {
+      this.hubConnection.on('ReceiveDeletedChannel', (channelId:any) => {
+       
+        console.log(channelId);
+    
+        subscriber.next(channelId);
       });
     });
   }

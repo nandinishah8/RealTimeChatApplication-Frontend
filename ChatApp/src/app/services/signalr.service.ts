@@ -283,9 +283,7 @@ export class SignalrService {
     return this.newChannelSubject.asObservable();
   }
 
-  // public  receiveUpdatedChannel() : Observable<any> {
-  //   return this.updatedChannelSubject.asObservable();
-  // }
+  
 }
 
 

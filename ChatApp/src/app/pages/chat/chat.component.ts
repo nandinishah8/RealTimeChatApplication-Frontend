@@ -68,36 +68,26 @@ export class ChatComponent implements OnInit {
 
       this.SignalrService.getNewChannelsObservable().subscribe((newChannel) => {
       console.log('New channel received:', newChannel);
-        // Add the new channel to your channels list
+      
         this.channels.push(newChannel);
-        // Update your UI to display the new channel
         this.cdr.detectChanges();
       });
     
    this.SignalrService.receiveUpdatedChannel().subscribe((updatedChannel: any) => {
-  // Handle the updated channel data here
+ 
   console.log('Received updated channel:', updatedChannel);
-
-  // Find the index of the channel to be updated
      const index = this.channels.findIndex((channel) => channel.channelId === updatedChannel.channelId);
      
-  console.log('Index:', index);
+  
 
   if (index !== -1) {
-    // Log the current state of the channel
-    console.log('Current channel:', this.channels[index]);
-
-    // Update the channel
     this.channels[index] = updatedChannel;
-
-    // Log the updated channel
-    console.log('Updated channel:', this.channels[index]);
   }
 
-  // Log the channels array
+ 
   console.log('Channels:', this.channels);
 
-  // Trigger change detection
+ 
   this.cdr.detectChanges();
 });
   
@@ -106,7 +96,7 @@ export class ChatComponent implements OnInit {
 
   
   ngOnInit(): void {
-    // Fetch the list of users
+    
     if (this.currentUserId) {
       this.loadChannels();
     }

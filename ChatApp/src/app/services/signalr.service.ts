@@ -22,7 +22,7 @@ export class SignalrService {
   private channelMessagesSubject = new Subject<any>();
   private newChannelSubject = new Subject<any>();
   private updatedChannelSubject: Subject<any> = new Subject<any>();
-  changeDetector: any;
+ 
   
  
  
@@ -160,12 +160,12 @@ export class SignalrService {
     }
   }
 
-   editChannel(channelId: number, updatedChannel: any) {
+   editChannel(channelId: any, updatedChannel: any) {
     if (this.hubConnection.state === signalR.HubConnectionState.Connected) {
       this.hubConnection
         .invoke('EditChannel', channelId, updatedChannel)
         .then(() => {
-          console.log('EditChannel request sent successfully');
+          console.log('EditChannel request sent successfully',channelId,updatedChannel);
         })
         .catch((error) => {
           console.error('Error sending EditChannel request:', error);
@@ -238,16 +238,28 @@ export class SignalrService {
       subscriber.next(message);
     });
   });
-}
+  }
+  
   receiveChannelMessages() {
     return new Observable((subscriber) => {
       this.hubConnection.on('ReceiveChannelMessage', (message: any) => {
       subscriber.next(message);
     });
     });
-    
-    
-}
+
+  }
+
+  receiveUpdatedChannel() {
+    return new Observable((subscriber) => {
+      this.hubConnection.on('ReceiveUpdatedChannel', (channelId:any,message: any) => {
+        console.log(message);
+        console.log(channelId);
+        const msg = { channelId: channelId, name: message.name, description: message.description, createdAt: message.createdAt }
+        subscriber.next(msg);
+      });
+    });
+  }
+        
   
 
 
@@ -271,9 +283,9 @@ export class SignalrService {
     return this.newChannelSubject.asObservable();
   }
 
-  public  receiveUpdatedChannel() {
-    return this.updatedChannelSubject.asObservable();
-  }
+  // public  receiveUpdatedChannel() : Observable<any> {
+  //   return this.updatedChannelSubject.asObservable();
+  // }
 }
 
 

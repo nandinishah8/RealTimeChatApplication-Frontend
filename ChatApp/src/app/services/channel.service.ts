@@ -64,9 +64,9 @@ export class ChannelService {
     Authorization: `Bearer ${token}`,
   });
     
-  const body = {
-    name,
-    description,
+    const body = {
+   name: name,
+  description: description,
   };
 
   return this.http.put<any>(`http://localhost:5243/api/Channels/${channelId}`, body, { headers });

@@ -7,6 +7,8 @@ import { ChatService } from '../../services/chat.service';
 import { SignalrService } from '../../services/signalr.service';
 import { ChannelService } from 'src/app/services/channel.service';
 import jwt_decode from 'jwt-decode';
+import { ChangeDetectorRef } from '@angular/core';
+
 
 import {
   FormGroup,
@@ -37,13 +39,13 @@ export class ChatComponent implements OnInit {
   channelEditForm: FormGroup;
   showEditModal!: boolean;
   channelId: string = '';
-
-  
-
   
   
 
-  constructor(private userService: UserService, private router: Router, private ChatService: ChatService, private SignalrService: SignalrService, private ChannelService: ChannelService, private formBuilder: FormBuilder) {
+  
+  
+
+  constructor(private userService: UserService, private router: Router, private ChatService: ChatService, private SignalrService: SignalrService, private ChannelService: ChannelService, private formBuilder: FormBuilder, private cdr: ChangeDetectorRef) {
     const token = localStorage.getItem('auth_token');
     console.log('JWT Token:', token);
 
@@ -67,22 +69,37 @@ export class ChatComponent implements OnInit {
       this.SignalrService.getNewChannelsObservable().subscribe((newChannel) => {
       console.log('New channel received:', newChannel);
         // Add the new channel to your channels list
-        this.loadChannels();
-      // Update your UI to display the new channel
+        this.channels.push(newChannel);
+        // Update your UI to display the new channel
+        this.cdr.detectChanges();
       });
     
-    this.SignalrService.receiveUpdatedChannel().subscribe((updatedChannel: any) => {
-      // Handle the updated channel data here
-      console.log('Received updated channel:', updatedChannel);
+   this.SignalrService.receiveUpdatedChannel().subscribe((updatedChannel: any) => {
+  // Handle the updated channel data here
+  console.log('Received updated channel:', updatedChannel);
 
-      
-      this.loadChannels();
-      
-      const index = this.channels.findIndex((channel) => channel.id === updatedChannel.id);
-      if (index !== -1) {
-        this.channels[index] = updatedChannel;
-      }
-    });
+  // Find the index of the channel to be updated
+     const index = this.channels.findIndex((channel) => channel.channelId === updatedChannel.channelId);
+     
+  console.log('Index:', index);
+
+  if (index !== -1) {
+    // Log the current state of the channel
+    console.log('Current channel:', this.channels[index]);
+
+    // Update the channel
+    this.channels[index] = updatedChannel;
+
+    // Log the updated channel
+    console.log('Updated channel:', this.channels[index]);
+  }
+
+  // Log the channels array
+  console.log('Channels:', this.channels);
+
+  // Trigger change detection
+  this.cdr.detectChanges();
+});
   
   
   }
@@ -253,6 +270,7 @@ export class ChatComponent implements OnInit {
   openEditChannelModal(channel: any) {
   
     this.channelEditForm.setValue({
+    
       name: channel.name,
       description: channel.description,
     });
@@ -283,20 +301,24 @@ export class ChatComponent implements OnInit {
   }
 
   
-  submitEditChannel(channel : any) {
+  submitEditChannel(channel: any) {
+    console.log(channel);
   if (this.selectedChannel) {
     const { name, description } = this.selectedChannel;
-    
-    this.ChannelService.updateChannel(
-      this.selectedChannel.channelId,
-      name,
-      description
-    ).subscribe(
+
+    this.ChannelService.updateChannel(this.selectedChannel.channelId, name, description).subscribe(
       (response) => {
-        // Refresh the list of channels
-        this.loadChannels();
         console.log('Channel updated successfully:', response);
+
+        
+        this.SignalrService.editChannel(this.selectedChannel.channelId, {
+          name: name,
+          description: description,
+        });
+
+        
         this.showEditModal = false;
+        this.cdr.detectChanges();
       },
       (error) => {
         console.error('Error updating channel:', error);
